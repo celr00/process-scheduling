@@ -30,6 +30,8 @@ int globalID = 0;
 bool executing = false;
 pid_t wpid;
 int status = 0;
+// Quantum para Round Robin
+int quantum = 5;
 
 // IMPRIMIR EVENTOS QUE HAN LLEGADO POR PARTE DEL CLIENTE
 void print_queue()
@@ -39,7 +41,7 @@ void print_queue()
         printf("\nPROCESOS ACTUALES\n");
         for (int i = 0; i < cola; i++)
         {
-            printf("ID %d (%d s)", procesos[i].id, procesos[i].burst_time);
+            printf("ID %d (%d s)", procesos[i].id, procesos[i].remaining_time);
             if (i < cola - 1)
                 printf("\t\t");
         }
@@ -153,6 +155,50 @@ void fifo()
     }
 }
 
+// ROUND ROBIN
+void round_robin()
+{
+    if (!is_queue_empty())
+    {
+        if (!executing)
+        {
+            print_queue();
+            // Seleccionar primer evento
+            Evento evento = dequeue(0);
+            // Asignar quantum o tiempo restante del proceso
+            int execute_time = (evento.remaining_time > quantum) ? quantum : evento.remaining_time;
+            // Actualizar tiempo restante del proceso
+            evento.remaining_time -= execute_time;
+            // Ejecutar parte del proceso
+            printf("RR: Ejecutar evento %d en %d segundos\n", evento.id, execute_time);
+            pid_t pid = fork();
+            executing = true;
+            if (pid == 0)
+            {
+                sleep(execute_time);
+                printf("Quantum de evento %d terminado, quedan %d segundos\n", evento.id, evento.remaining_time);
+                exit(0);
+            }
+            while ((wpid = wait(&status)) > 0)
+                ; // Esperar ejecución de evento
+            // Volver a meter evento si aún no se termina
+            if (evento.remaining_time > 0)
+            {
+                printf("Agregando evento %d nuevamente\n", evento.id);
+                enqueue(evento);
+            }
+            else
+            {
+                printf("Evento %d terminado\n", evento.id);
+            }
+        }
+    }
+    else
+    {
+        sleep(5);
+    }
+}
+
 // SHORTEST JOB FIRST
 void sjf()
 {
@@ -188,6 +234,28 @@ void sjf()
             dequeue(minIndex);
         }
     }
+    else
+    {
+        sleep(5);
+    }
+}
+
+// SHORTEST REMAINING TIME
+void srt()
+{
+    printf("Shortest Remaining Time\n");
+}
+
+// HIGHEST RESPONSE-RATIO NEXT
+void hrrn()
+{
+    printf("Highest Response-Ratio Next\n");
+}
+
+// MULTILEVEL FEEDBACK QUEUES
+void mlfq()
+{
+    printf("Multilevel Feedback Queues\n");
 }
 
 // TERMINACIÓN DE EVENTO
@@ -222,6 +290,7 @@ int main()
     {
         // fcfs();
         // fifo();
-        sjf();
+        // sjf();
+        round_robin();
     }
 }
