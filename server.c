@@ -94,9 +94,9 @@ bool is_queue_empty()
 }
 
 // RECIBIR EVENTOS DEL CLIENTE
-void funcion_usr1(int sig)
+void funcion_usr1(int sig, siginfo_t *info, void *secret)
 {
-    printf("Señal recibida de %d. Creando proceso con ID %d\n", getpid(), globalID);
+    printf("Señal recibida de %d. Creando proceso con ID %d\n", getpgid(info->si_pid), globalID);
     int random_number = (rand() % 20) + 1; // Duración aleatoria
     Evento event = {globalID, random_number, random_number, 0, 0, 0};
     enqueue(event);
@@ -267,9 +267,17 @@ void funcion_chld(int sig)
 // PROGRAMA PRINCIPAL
 int main()
 {
+    // Semilla para números aleatorios
     srand(time(NULL));
 
-    signal(SIGUSR1, funcion_usr1);
+    // Manejador de señales de SIGUSR1 (Se usa sigaction para conocer quién mandó la señal)
+    struct sigaction s;
+    s.sa_sigaction = funcion_usr1;
+    sigemptyset(&s.sa_mask);
+    s.sa_flags = SA_SIGINFO;
+    sigaction(SIGUSR1, &s, NULL);
+
+    // Manejador de señales de SIGCHLD (Notifica cuándo se termina un evento)
     signal(SIGCHLD, funcion_chld);
 
     printf("Proceso con PID: %d\n", getpid());
