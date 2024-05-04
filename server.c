@@ -36,6 +36,7 @@ int currentEventId = -1;
 int quantum = 5;
 // Segundos actuales
 int currentSeconds = 0;
+int second_1 = 1;
 
 // IMPRIMIR EVENTOS QUE HAN LLEGADO POR PARTE DEL CLIENTE
 void print_queue()
@@ -117,10 +118,12 @@ int getShortestJob()
 // Ejecución de thread
 void *sleep_process(void *sleeping_time)
 {
-    // Print value received as argument
-    int i = *(int *)sleeping_time;
-    sleep(i);
-    // Return reference to global variable:
+    int st = *(int *)sleeping_time;
+    for (int i = 0; i < st; i++)
+    {
+        sleep(1);
+        currentSeconds++;
+    }
     pthread_exit(NULL);
 }
 
@@ -271,7 +274,7 @@ void hrrn()
         {
             Evento *evento = &procesos[i];
             evento->response_ratio = (evento->waiting_time + evento->burst_time) * 1.0 / evento->burst_time;
-            printf("ID: %d\tBT: %d\tWT: %d\tRR: %.3f\n", evento->id, evento->burst_time, evento->waiting_time, evento->response_ratio);
+            printf("ID: %d\tBT: %d\tAT:%d\tWT: %d\tRR: %.3f\n", evento->id, evento->burst_time, evento->arrival_time, evento->waiting_time, evento->response_ratio);
             if (evento->response_ratio > maxRR)
             {
                 maxIndex = i;
@@ -282,13 +285,11 @@ void hrrn()
         printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        int x = 1;
         for (int i = 0; i < evento.burst_time; i++)
         {
             pthread_t id;
-            pthread_create(&id, NULL, sleep_process, &x);
+            pthread_create(&id, NULL, sleep_process, &second_1);
             pthread_join(id, NULL);
-            currentSeconds++;
         }
         executing = false;
         // Actualizar tiempos de espera de todos los procesos menos del actual
@@ -350,10 +351,8 @@ int main()
         else
         {
             pthread_t id;
-            int x = 1;
-            pthread_create(&id, NULL, sleep_process, &x);
+            pthread_create(&id, NULL, sleep_process, &second_1);
             pthread_join(id, NULL);
-            currentSeconds++;
         }
     }
 }
