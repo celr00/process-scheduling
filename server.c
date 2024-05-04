@@ -303,12 +303,6 @@ void mlfq()
     printf("Multilevel Feedback Queues\n");
 }
 
-// TERMINACIÓN DE EVENTO
-void funcion_chld(int sig)
-{
-    executing = false;
-}
-
 // PROGRAMA PRINCIPAL
 int main()
 {
@@ -321,9 +315,6 @@ int main()
     sigemptyset(&s.sa_mask);
     s.sa_flags = SA_SIGINFO;
     sigaction(SIGUSR1, &s, NULL);
-
-    // Manejador de señales de SIGCHLD (Notifica cuándo se termina un evento)
-    signal(SIGCHLD, funcion_chld);
 
     printf("Proceso con PID: %d\n", getpid());
 
