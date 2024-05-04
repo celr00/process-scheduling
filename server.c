@@ -18,6 +18,7 @@ typedef struct estructura
     int arrival_time;
     int turn_around_time;
     int waiting_time;
+    float response_ratio;
 } Evento;
 
 // VARIABLES GLOBALES
@@ -111,11 +112,21 @@ int getShortestJob()
     return minIndex;
 }
 
+// Ejecución de thread
+void *sleep_process(void *sleeping_time)
+{
+    // Print value received as argument
+    int i = *(int *)sleeping_time;
+    sleep(i);
+    // Return reference to global variable:
+    pthread_exit(NULL);
+}
+
 // RECIBIR EVENTOS DEL CLIENTE
 void funcion_usr1(int sig, siginfo_t *info, void *secret)
 {
     int random_number = (rand() % 20) + 1; // Duración aleatoria
-    Evento event = {globalID, random_number, random_number, 0, 0, 0};
+    Evento event = {globalID, random_number, random_number, 0, 0, 0, 0.0};
     printf("Señal recibida de %d. Creando proceso con ID %d (Burst Time: %d s)\n", getpgid(info->si_pid), globalID, random_number);
     enqueue(event);
     globalID++;
@@ -127,16 +138,15 @@ void fcfs()
     if (!executing)
     {
         print_queue();
-        Evento event = dequeue(0);
-        printf("FCFS: Ejecutar evento %d en %d segundos\n", event.id, event.burst_time);
-        pid_t pid = fork();
+        Evento evento = dequeue(0);
+        printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        if (pid == 0)
-        {
-            sleep(event.burst_time);
-            printf("Evento %d terminado\n", event.id);
-            exit(0);
-        }
+        pthread_t id;
+        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
+        pthread_join(id, NULL);
+        executing = false;
+        printf("Evento %d terminado\n", evento.id);
     }
 }
 
@@ -146,16 +156,15 @@ void fifo()
     if (!executing)
     {
         print_queue();
-        Evento event = dequeue(0);
-        printf("FIFO: Ejecutar evento %d en %d segundos\n", event.id, event.burst_time);
-        pid_t pid = fork();
+        Evento evento = dequeue(0);
+        printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        if (pid == 0)
-        {
-            sleep(event.burst_time);
-            printf("Evento %d terminado\n", event.id);
-            exit(0);
-        }
+        pthread_t id;
+        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
+        pthread_join(id, NULL);
+        executing = false;
+        printf("Evento %d terminado\n", evento.id);
     }
 }
 
@@ -173,16 +182,13 @@ void round_robin()
         evento.remaining_time -= execute_time;
         // Ejecutar parte del proceso
         printf("RR: Ejecutar evento %d en %d segundos\n", evento.id, execute_time);
-        pid_t pid = fork();
+        // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        if (pid == 0)
-        {
-            sleep(execute_time);
-            printf("Quantum de evento %d terminado, quedan %d segundos\n", evento.id, evento.remaining_time);
-            exit(0);
-        }
-        while ((wpid = wait(&status)) > 0)
-            ; // Esperar ejecución de evento
+        pthread_t id;
+        pthread_create(&id, NULL, sleep_process, &execute_time);
+        pthread_join(id, NULL);
+        executing = false;
+        printf("Quantum de evento %d terminado, quedan %d segundos\n", evento.id, evento.remaining_time);
         // Volver a meter evento si aún no se termina
         if (evento.remaining_time > 0)
         {
@@ -206,16 +212,12 @@ void sjf()
         int minIndex = getShortestJob();
         Evento event = procesos[minIndex];
         printf("SJF: Ejecutar evento %d en %d segundos\n", event.id, event.burst_time);
-        pid_t pid = fork();
+        // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        if (pid == 0)
-        {
-            sleep(event.burst_time);
-            printf("Evento %d terminado\n", event.id);
-            exit(0);
-        }
-        while ((wpid = wait(&status)) > 0)
-            ; // Esperar ejecución de evento
+        pthread_t id;
+        pthread_create(&id, NULL, sleep_process, &event.burst_time);
+        pthread_join(id, NULL);
+        executing = false;
         dequeue(minIndex);
     }
 }
@@ -225,26 +227,22 @@ void srt()
 {
     if (!executing)
     {
-        // print_queue();
         // Obtener trabajo más corto
         int minIndex = getShortestJob();
-        // printf("Mínimo índice actual %d\n", minIndex);
         Evento *evento = &procesos[minIndex]; // Apuntar a arreglo de procesos para poder actualizarlo posteriormente
         if (currentEventId != evento->id)
         {
             currentEventId = evento->id;
             print_queue();
-            printf("SRT: Cambiando a proceso %d con tiempo de ejecución: %d\n", evento->id, evento->remaining_time);
+            printf("SRT: Cambiando a proceso %d con tiempo de ejecución: %d s\n", evento->id, evento->remaining_time);
         }
-        pid_t pid = fork();
+        // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        if (pid == 0)
-        {
-            sleep(1);
-            exit(0);
-        }
-        while ((wpid = wait(&status)) > 0)
-            ; // Esperar ejecución de evento
+        pthread_t id;
+        int sleep_time = 1;
+        pthread_create(&id, NULL, sleep_process, &sleep_time);
+        pthread_join(id, NULL);
+        executing = false;
         // Actualizar tiempo de evento
         evento->remaining_time--;
         // Eliminar evento si ya terminó
@@ -280,12 +278,11 @@ void hrrn()
         }
         Evento evento = procesos[maxIndex];
         printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
-        // Crear un thread con el proceso
+        // Crear un thread con el evento y esperar a que éste termine
+        executing = true;
         pthread_t id;
         pthread_create(&id, NULL, sleep_process, &evento.burst_time);
-        int *ptr;
-        // Esperar a que termine el thread
-        pthread_join(id, (void **)&ptr);
+        pthread_join(id, NULL);
         executing = false;
         // Actualizar tiempos de espera de todos los procesos menos del actual
         int n2 = get_queue_length();
@@ -332,11 +329,10 @@ int main()
 
     // Para pruebas
     /* Evento eventos[] = {
-        {1, 5, 5, 0, 0, 0},
-        {2, 3, 3, 0, 0, 0},
-        {3, 4, 4, 0, 0, 0},
-        {4, 6, 6, 0, 0, 0}
-    };
+        {1, 5, 5, 0, 0, 0, 0.0},
+        {2, 3, 3, 0, 0, 0, 0.0},
+        {3, 4, 4, 0, 0, 0, 0.0},
+        {4, 6, 6, 0, 0, 0, 0.0}};
     enqueue(eventos[0]);
     enqueue(eventos[1]);
     enqueue(eventos[2]);
@@ -348,9 +344,10 @@ int main()
         {
             // fcfs();
             // fifo();
-            // sjf();
             // round_robin();
-            srt();
+            // sjf();
+            // srt();
+            hrrn();
         }
         else
         {
