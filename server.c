@@ -34,13 +34,15 @@ int status = 0;
 int currentEventId = -1;
 // Quantum para Round Robin
 int quantum = 5;
+// Segundos actuales
+int currentSeconds = 0;
 
 // IMPRIMIR EVENTOS QUE HAN LLEGADO POR PARTE DEL CLIENTE
 void print_queue()
 {
     if (cabeza != cola)
     {
-        printf("\nPROCESOS ACTUALES\n");
+        printf("\nPROCESOS ACTUALES (T = %d s)\n", currentSeconds);
         for (int i = 0; i < cola; i++)
         {
             printf("ID %d (%d s)", procesos[i].id, procesos[i].remaining_time);
@@ -126,8 +128,8 @@ void *sleep_process(void *sleeping_time)
 void funcion_usr1(int sig, siginfo_t *info, void *secret)
 {
     int random_number = (rand() % 20) + 1; // Duración aleatoria
-    Evento event = {globalID, random_number, random_number, 0, 0, 0, 0.0};
-    printf("Señal recibida de %d. Creando proceso con ID %d (Burst Time: %d s)\n", getpgid(info->si_pid), globalID, random_number);
+    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0};
+    printf("Señal recibida de %d. Creando proceso...\tID %d\t\tBT: %d s / AT: %d s\n", getpgid(info->si_pid), globalID, random_number, currentSeconds);
     enqueue(event);
     globalID++;
 }
@@ -280,19 +282,23 @@ void hrrn()
         printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
-        pthread_join(id, NULL);
+        int x = 1;
+        for (int i = 0; i < evento.burst_time; i++)
+        {
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &x);
+            pthread_join(id, NULL);
+            currentSeconds++;
+        }
         executing = false;
         // Actualizar tiempos de espera de todos los procesos menos del actual
         int n2 = get_queue_length();
         for (int i = 0; i < n2; i++)
         {
             if (procesos[i].id != evento.id)
-            {
-                procesos[i].waiting_time += evento.burst_time;
-            }
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
         }
+        printf("Evento %d terminado\n", evento.id);
         dequeue(maxIndex);
     }
 }
@@ -323,7 +329,8 @@ int main()
         {1, 5, 5, 0, 0, 0, 0.0},
         {2, 3, 3, 0, 0, 0, 0.0},
         {3, 4, 4, 0, 0, 0, 0.0},
-        {4, 6, 6, 0, 0, 0, 0.0}};
+        {4, 6, 6, 0, 0, 0, 0.0}
+    };
     enqueue(eventos[0]);
     enqueue(eventos[1]);
     enqueue(eventos[2]);
@@ -342,7 +349,11 @@ int main()
         }
         else
         {
-            sleep(5);
+            pthread_t id;
+            int x = 1;
+            pthread_create(&id, NULL, sleep_process, &x);
+            pthread_join(id, NULL);
+            currentSeconds++;
         }
     }
 }
