@@ -259,7 +259,45 @@ void srt()
 // HIGHEST RESPONSE-RATIO NEXT
 void hrrn()
 {
-    printf("Highest Response-Ratio Next\n");
+    if (!executing)
+    {
+        print_queue();
+        // Calcular response ratio de cada proceso
+        int n = get_queue_length();
+        float maxRR = 0;
+        int maxIndex;
+        printf("\n");
+        for (int i = 0; i < n; i++)
+        {
+            Evento *evento = &procesos[i];
+            evento->response_ratio = (evento->waiting_time + evento->burst_time) * 1.0 / evento->burst_time;
+            printf("ID: %d\tBT: %d\tWT: %d\tRR: %.3f\n", evento->id, evento->burst_time, evento->waiting_time, evento->response_ratio);
+            if (evento->response_ratio > maxRR)
+            {
+                maxIndex = i;
+                maxRR = evento->response_ratio;
+            }
+        }
+        Evento evento = procesos[maxIndex];
+        printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
+        // Crear un thread con el proceso
+        pthread_t id;
+        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
+        int *ptr;
+        // Esperar a que termine el thread
+        pthread_join(id, (void **)&ptr);
+        executing = false;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+            {
+                procesos[i].waiting_time += evento.burst_time;
+            }
+        }
+        dequeue(maxIndex);
+    }
 }
 
 // MULTILEVEL FEEDBACK QUEUES
