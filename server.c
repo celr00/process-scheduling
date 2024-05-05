@@ -354,77 +354,80 @@ void hrrn()
 // MULTILEVEL FEEDBACK QUEUES
 void mlfq()
 {
-    if (get_q0_length() != 0)
+    if (!executing)
     {
-        printf("\nMLFQ: Ejecutar evento de Q0 (quantum=5)\n");
-        print_queue(q0, cabeza_q0, cola_q0);
-        Evento e = dequeue(0, q0, &cabeza_q0, &cola_q0);
-        // Asignar quantum o tiempo restante del proceso
-        int execute_time = (e.remaining_time > quantum_q0) ? quantum_q0 : e.remaining_time;
-        // Actualizar tiempo restante del proceso
-        e.remaining_time -= execute_time;
-        // Ejecutar parte del proceso
-        printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
-        // Crear un thread con el evento y esperar a que éste termine
-        executing = true;
-        pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &execute_time);
-        pthread_join(id, NULL);
-        executing = false;
-        printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
-        // Meter a siguiente queue si el evento aún no termina
-        if (e.remaining_time > 0)
+        if (get_q0_length() != 0)
         {
-            printf("Agregando evento %d a Q1\n", e.id);
-            enqueue(e, q1, &cola_q1);
+            printf("\nMLFQ: Ejecutar evento de Q0 (quantum=5)\n");
+            print_queue(q0, cabeza_q0, cola_q0);
+            Evento e = dequeue(0, q0, &cabeza_q0, &cola_q0);
+            // Asignar quantum o tiempo restante del proceso
+            int execute_time = (e.remaining_time > quantum_q0) ? quantum_q0 : e.remaining_time;
+            // Actualizar tiempo restante del proceso
+            e.remaining_time -= execute_time;
+            // Ejecutar parte del proceso
+            printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
+            // Crear un thread con el evento y esperar a que éste termine
+            executing = true;
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &execute_time);
+            pthread_join(id, NULL);
+            executing = false;
+            printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Meter a siguiente queue si el evento aún no termina
+            if (e.remaining_time > 0)
+            {
+                printf("Agregando evento %d a Q1\n", e.id);
+                enqueue(e, q1, &cola_q1);
+            }
+            else
+            {
+                printf("Evento %d terminado\n", e.id);
+            }
         }
-        else
+        else if (get_q1_length() != 0)
         {
+            printf("\nMLFQ: Ejecutar evento de Q1 (quantum=8)\n");
+            print_queue(q1, cabeza_q1, cola_q1);
+            Evento e = dequeue(0, q1, &cabeza_q1, &cola_q1);
+            // Asignar quantum o tiempo restante del proceso
+            int execute_time = (e.remaining_time > quantum_q1) ? quantum_q1 : e.remaining_time;
+            // Actualizar tiempo restante del proceso
+            e.remaining_time -= execute_time;
+            // Ejecutar parte del proceso
+            printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
+            // Crear un thread con el evento y esperar a que éste termine
+            executing = true;
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &execute_time);
+            pthread_join(id, NULL);
+            executing = false;
+            printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Meter a siguiente queue si el evento aún no termina
+            if (e.remaining_time > 0)
+            {
+                printf("Agregando evento %d a Q2\n", e.id);
+                enqueue(e, q2, &cola_q2);
+            }
+            else
+            {
+                printf("Evento %d terminado\n", e.id);
+            }
+        }
+        else if (get_q2_length() != 0)
+        {
+            printf("\nMLFQ: Ejecutar evento de Q2 (FCFS)\n");
+            print_queue(q2, cabeza_q2, cola_q2);
+            Evento e = dequeue(0, q2, &cabeza_q2, &cola_q2);
+            printf("Ejecutar evento %d en %d segundos\n", e.id, e.remaining_time);
+            // Crear un thread con el evento y esperar a que éste termine
+            executing = true;
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &e.remaining_time);
+            pthread_join(id, NULL);
+            executing = false;
             printf("Evento %d terminado\n", e.id);
         }
-    }
-    else if (get_q1_length() != 0)
-    {
-        printf("\nMLFQ: Ejecutar evento de Q1 (quantum=8)\n");
-        print_queue(q1, cabeza_q1, cola_q1);
-        Evento e = dequeue(0, q1, &cabeza_q1, &cola_q1);
-        // Asignar quantum o tiempo restante del proceso
-        int execute_time = (e.remaining_time > quantum_q1) ? quantum_q1 : e.remaining_time;
-        // Actualizar tiempo restante del proceso
-        e.remaining_time -= execute_time;
-        // Ejecutar parte del proceso
-        printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
-        // Crear un thread con el evento y esperar a que éste termine
-        executing = true;
-        pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &execute_time);
-        pthread_join(id, NULL);
-        executing = false;
-        printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
-        // Meter a siguiente queue si el evento aún no termina
-        if (e.remaining_time > 0)
-        {
-            printf("Agregando evento %d a Q2\n", e.id);
-            enqueue(e, q2, &cola_q2);
-        }
-        else
-        {
-            printf("Evento %d terminado\n", e.id);
-        }
-    }
-    else if (get_q2_length() != 0)
-    {
-        printf("\nMLFQ: Ejecutar evento de Q2 (FCFS)\n");
-        print_queue(q2, cabeza_q2, cola_q2);
-        Evento e = dequeue(0, q2, &cabeza_q2, &cola_q2);
-        printf("Ejecutar evento %d en %d segundos\n", e.id, e.remaining_time);
-        // Crear un thread con el evento y esperar a que éste termine
-        executing = true;
-        pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &e.remaining_time);
-        pthread_join(id, NULL);
-        executing = false;
-        printf("Evento %d terminado\n", e.id);
     }
 }
 
@@ -466,21 +469,14 @@ int main()
 
     while (1)
     {
-        /*if (!is_queue_empty()) {
-            // fcfs();
+        if (!is_queue_empty())
+        {
+            fcfs();
             // fifo();
             // round_robin();
             // sjf();
             // srt();
             // hrrn();
-        } else {
-            pthread_t id;
-            pthread_create(&id, NULL, sleep_process, &second_1);
-            pthread_join(id, NULL);
-        }*/
-        if (get_q0_length() != 0 || get_q1_length() != 0 || get_q2_length() != 0)
-        {
-            mlfq();
         }
         else
         {
@@ -488,5 +484,12 @@ int main()
             pthread_create(&id, NULL, sleep_process, &second_1);
             pthread_join(id, NULL);
         }
+        /*if (get_q0_length() != 0 || get_q1_length() != 0 || get_q2_length() != 0) {
+            mlfq();
+        } else {
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &second_1);
+            pthread_join(id, NULL);
+        }*/
     }
 }
