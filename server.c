@@ -9,28 +9,6 @@
 
 #define SIZE 10000
 
-// PRIORIDADES
-enum Priority
-{
-    HIGH = 1,
-    MEDIUM = 2,
-    LOW = 3
-};
-
-// IMPRIMIR PRIORIDAD
-const char *getPriority(enum Priority p)
-{
-    switch (p)
-    {
-    case HIGH:
-        return "HIGH";
-    case MEDIUM:
-        return "MEDIUM";
-    case LOW:
-        return "LOW";
-    }
-}
-
 // ESTRUCTURA DE EVENTOS
 typedef struct estructura
 {
@@ -41,7 +19,6 @@ typedef struct estructura
     int turn_around_time;
     int waiting_time;
     float response_ratio;
-    enum Priority priority;
 } Evento;
 
 // VARIABLES GLOBALES
@@ -163,24 +140,12 @@ void *sleep_process(void *sleeping_time)
 // RECIBIR EVENTOS DEL CLIENTE
 void funcion_usr1(int sig, siginfo_t *info, void *secret)
 {
-    int random_number = (rand() % 20) + 1;  // Duración aleatoria
-    int random_priority = (rand() % 3) + 1; // Prioridad aleatoria
-    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, random_priority};
-    printf("Señal recibida de %d. Creando proceso...\tID %d\t\tPrioridad: %s / BT: %d s / AT: %d s\n", getpgid(info->si_pid), globalID, getPriority(random_priority), random_number, currentSeconds);
+    int random_number = (rand() % 20) + 1; // Duración aleatoria
+    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0};
+    printf("Señal recibida de %d. Creando proceso...\tID %d\t\tBT: %d s / AT: %d s\n", getpgid(info->si_pid), globalID, random_number, currentSeconds);
     enqueue(event, procesos, &cola);
-    // Agregar a queue de MLFQ según prioridad
-    switch (random_priority)
-    {
-    case 1:
-        enqueue(event, q0, &cola_q0);
-        break;
-    case 2:
-        enqueue(event, q1, &cola_q1);
-        break;
-    case 3:
-        enqueue(event, q2, &cola_q2);
-        break;
-    }
+    // Agregar a queue de MLFQ
+    enqueue(event, q0, &cola_q0);
     globalID++;
 }
 
@@ -447,36 +412,39 @@ int main()
     printf("Proceso con PID: %d\n", getpid());
 
     // Para pruebas
-    /* Evento eventos[] = {
-        {1, 5, 5, 0, 0, 0, 0.0, HIGH},
-        {2, 3, 3, 0, 0, 0, 0.0, MEDIUM},
-        {3, 4, 4, 0, 0, 0, 0.0, HIGH},
-        {4, 16, 16, 0, 0, 0, 0.0, HIGH}
-    };
+    Evento eventos[] = {
+        {1, 5, 5, 0, 0, 0, 0.0},
+        {2, 3, 3, 0, 0, 0, 0.0},
+        {3, 4, 4, 0, 0, 0, 0.0},
+        {4, 16, 16, 0, 0, 0, 0.0}};
     enqueue(eventos[0], procesos, &cola);
     enqueue(eventos[1], procesos, &cola);
     enqueue(eventos[2], procesos, &cola);
     enqueue(eventos[3], procesos, &cola);
 
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         Evento e = eventos[i];
-        switch (e.priority) {
-            case 1: enqueue(e, q0, &cola_q0); break;
-            case 2: enqueue(e, q1, &cola_q1); break;
-            case 3: enqueue(e, q2, &cola_q2); break;
-        }
-    } */
+        enqueue(e, q0, &cola_q0);
+    }
 
     while (1)
     {
-        if (!is_queue_empty())
-        {
+        /* if (!is_queue_empty()) {
             fcfs();
             // fifo();
             // round_robin();
             // sjf();
             // srt();
             // hrrn();
+        } else {
+            pthread_t id;
+            pthread_create(&id, NULL, sleep_process, &second_1);
+            pthread_join(id, NULL);
+        } */
+        if (get_q0_length() != 0 || get_q1_length() != 0 || get_q2_length() != 0)
+        {
+            mlfq();
         }
         else
         {
@@ -484,12 +452,5 @@ int main()
             pthread_create(&id, NULL, sleep_process, &second_1);
             pthread_join(id, NULL);
         }
-        /*if (get_q0_length() != 0 || get_q1_length() != 0 || get_q2_length() != 0) {
-            mlfq();
-        } else {
-            pthread_t id;
-            pthread_create(&id, NULL, sleep_process, &second_1);
-            pthread_join(id, NULL);
-        }*/
     }
 }
