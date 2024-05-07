@@ -182,16 +182,16 @@ void funcion_int_exit()
 }
 
 // Añadir un cliente a la lista de interesados
-void add_event(int idCliente, int type)
+void add_event(pid_t idCliente, int type)
 {
-    printf("Añadir cliente con ID %d a lista de interesados %s\n", idCliente, getEventType(type));
+    printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // --- CODE HERE ---
 }
 
 // Eliminar un cliente de la lista de interesados
-void remove_event(int idCliente, int type)
+void remove_event(pid_t idCliente, int type)
 {
-    printf("Eliminar cliente con ID %d de lista de interesados %s\n", idCliente, getEventType(type));
+    printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // --- CODE HERE ---
 }
 
@@ -244,9 +244,9 @@ void change_algorithm()
 }
 
 // SIGUSR1: Cambio de algoritmo
-void funcion_usr1(int idCliente)
+void funcion_usr1(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo.\n");
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo.\n", getpgid(idCliente));
     printf("Seleccione el tipo de algoritmo a cambiar.\n");
     change_algorithm();
 }
@@ -298,35 +298,34 @@ void funcion_tstp(int sig)
 // Manejador de SIGACTION
 void funcion_sigaction(int sig, siginfo_t *info, void *secret)
 {
-    int idCliente = getpgid(info->si_pid);
-    printf("\nSeñal recibida de cliente con ID %d.\n", idCliente);
+    printf("\nSeñal recibida de cliente con ID %d.\n", getpgid(info->si_pid));
     if (sig == SIGALRM)
     {
-        add_event(idCliente, 1);
+        add_event(info->si_pid, 1);
     }
     else if (sig == SIGTERM)
     {
-        add_event(idCliente, 2);
+        add_event(info->si_pid, 2);
     }
     else if (sig == SIGHUP)
     {
-        add_event(idCliente, 3);
+        add_event(info->si_pid, 3);
     }
     else if (sig == SIGBUS)
     {
-        remove_event(idCliente, 1);
+        remove_event(info->si_pid, 1);
     }
     else if (sig == SIGSEGV)
     {
-        remove_event(idCliente, 2);
+        remove_event(info->si_pid, 2);
     }
     else if (sig == SIGUSR2)
     {
-        remove_event(idCliente, 3);
+        remove_event(info->si_pid, 3);
     }
     else if (sig == SIGUSR1)
     {
-        funcion_usr1(idCliente);
+        funcion_usr1(info->si_pid);
     }
 }
 
