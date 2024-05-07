@@ -336,35 +336,35 @@ void send_start(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de LIMPIEZA comenzó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGCONT a lista de clientes de que evento de LIMPIEZA comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     case 2:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGCONT a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     case 3:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGCONT a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     }
 }
 
-// Enviar señal SIGUSR2 a todos los clientes suscritos para notificar que un evento de un tipo terminó
+// Enviar señal SIGPIPE a todos los clientes suscritos para notificar que un evento de un tipo terminó
 void send_end(int tipoEvento)
 {
     switch (tipoEvento)
     {
     case 1:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de LIMPIEZA terminó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGPIPE a lista de clientes de que evento de LIMPIEZA terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     case 2:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGPIPE a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     case 3:
-        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGPIPE a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
         break;
     }

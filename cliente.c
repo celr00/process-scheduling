@@ -68,21 +68,47 @@ void ask_algorithm()
     // --- CODE HERE ---
 }
 
+// Solicitar cambio de algoritmo al servidor
+void change_algorithm()
+{
+    printf("Solicitando cambio de algoritmo...\n");
+    char comando[100];
+    sprintf(comando, "kill -s USR1 %d", serverPID);
+    system(comando);
+}
+
+// Notificar al cliente inicio de un evento
+void event_start()
+{
+    printf("Uno de los eventos a los que está suscrito ha comenzado su ejecución.\n");
+}
+
+// Notificar al cliente fin de un evento
+void event_end()
+{
+    printf("Uno de los eventos a los que está suscrito ha terminado su ejecución.\n");
+}
+
 int main()
 {
     printf("PID del proceso: %d\n", getpid());
+
+    // Manejadores de señales
+    signal(SIGCONT, event_start);
+    signal(SIGPIPE, event_end);
 
     printf("\nEscriba el PID del proceso padre: ");
     scanf("%d", &serverPID);
 
     while (1)
     {
-        printf("MENÚ DE OPCIONES\n");
+        printf("\nMENÚ DE OPCIONES\n");
         printf("1) Suscribirse a un evento.\n");
         printf("2) Desuscribirse de un evento.\n");
         printf("3) Ver eventos a los que estoy suscrito.\n");
         printf("4) Listar eventos disponibles.\n");
         printf("5) Listar algoritmos disponibles.\n");
+        printf("6) Solicitar cambio de algoritmo.\n");
         scanf("%d", &opc);
 
         switch (opc)
@@ -105,6 +131,9 @@ int main()
             break;
         case 5:
             ask_algorithm();
+            break;
+        case 6:
+            change_algorithm();
             break;
         default:
             printf("Opción inválida.\n");
