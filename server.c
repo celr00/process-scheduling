@@ -49,12 +49,11 @@ char *getEventType(int type)
 // ----- VARIABLES GLOBALES -----
 // Arreglo de eventos/peticiones que llegan por parte del cliente
 Evento procesos[SIZE];
-int cabeza = 0, cola = 0;
+int cola = 0;
 // Identificador de procesos
 int globalID = 0;
 // Ejecución de un proceso/evento
 bool executing = false;
-pid_t wpid;
 int status = 0;
 int currentEventId = -1;
 // Quantum para Round Robin
@@ -71,7 +70,7 @@ int currentAlgorithm = 1;
 Evento q0[SIZE]; // High priority
 Evento q1[SIZE];
 Evento q2[SIZE]; // Low priority
-int cabeza_q0 = 0, cola_q0 = 0, cabeza_q1 = 0, cola_q1 = 0, cabeza_q2 = 0, cola_q2 = 0;
+int cola_q0 = 0, cola_q1 = 0, cola_q2 = 0;
 int quantum_q0 = 5, quantum_q1 = 10;
 int get_q0_length() { return cola_q0; }
 int get_q1_length() { return cola_q1; }
@@ -80,9 +79,9 @@ int get_q2_length() { return cola_q2; }
 // ----- MANEJO DE EVENTOS -----
 
 // Imprimir eventos
-void print_queue(Evento q[], int head, int tail)
+void print_queue(Evento q[], int tail)
 {
-    if (head != tail)
+    if (tail != 0)
     {
         printf("\nPROCESOS ACTUALES (T = %d s)\n", currentSeconds);
         for (int i = 0; i < tail; i++)
@@ -110,9 +109,9 @@ void enqueue(Evento evento, Evento q[], int *tail)
 }
 
 // Eliminar evento de una posición
-Evento dequeue(int index, Evento q[], int *head, int *tail)
+Evento dequeue(int index, Evento q[], int *tail)
 {
-    if (*head != *tail)
+    if (*tail != 0)
     {
         Evento evento = q[index];
         for (int i = index; i < *tail; i++)
@@ -133,7 +132,7 @@ int get_queue_length()
 // Muestra si la fila está vacía
 bool is_queue_empty()
 {
-    if (cabeza == cola)
+    if (cola == 0)
         return true;
     else
         return false;
@@ -376,8 +375,8 @@ void fcfs()
 {
     if (!executing)
     {
-        print_queue(procesos, cabeza, cola);
-        Evento evento = dequeue(0, procesos, &cabeza, &cola);
+        print_queue(procesos, cola);
+        Evento evento = dequeue(0, procesos, &cola);
         printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
@@ -396,8 +395,8 @@ void fifo()
 {
     if (!executing)
     {
-        print_queue(procesos, cabeza, cola);
-        Evento evento = dequeue(0, procesos, &cabeza, &cola);
+        print_queue(procesos, cola);
+        Evento evento = dequeue(0, procesos, &cola);
         printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
@@ -416,9 +415,9 @@ void round_robin()
 {
     if (!executing)
     {
-        print_queue(procesos, cabeza, cola);
+        print_queue(procesos, cola);
         // Seleccionar primer evento
-        Evento evento = dequeue(0, procesos, &cabeza, &cola);
+        Evento evento = dequeue(0, procesos, &cola);
         // Asignar quantum o tiempo restante del proceso
         int execute_time = (evento.remaining_time > quantum) ? quantum : evento.remaining_time;
         // Actualizar tiempo restante del proceso
@@ -452,7 +451,7 @@ void sjf()
 {
     if (!executing)
     {
-        print_queue(procesos, cabeza, cola);
+        print_queue(procesos, cola);
         // Encontrar trabajo más corto
         int minIndex = getShortestJob();
         Evento event = procesos[minIndex];
@@ -464,7 +463,7 @@ void sjf()
         pthread_create(&id, NULL, sleep_process, &event.burst_time);
         pthread_join(id, NULL);
         executing = false;
-        dequeue(minIndex, procesos, &cabeza, &cola);
+        dequeue(minIndex, procesos, &cola);
         printf("Evento %d terminado\n", event.id);
         send_end(event.type);
     }
@@ -481,7 +480,7 @@ void srt()
         if (currentEventId != evento->id)
         {
             currentEventId = evento->id;
-            print_queue(procesos, cabeza, cola);
+            print_queue(procesos, cola);
             printf("SRT: Cambiando a proceso %d con tiempo de ejecución: %d s\n", evento->id, evento->remaining_time);
             send_start(evento->type);
         }
@@ -499,7 +498,7 @@ void srt()
         {
             printf("Evento %d terminado\n", evento->id);
             send_end(evento->type);
-            dequeue(minIndex, procesos, &cabeza, &cola);
+            dequeue(minIndex, procesos, &cola);
         }
     }
 }
@@ -509,7 +508,7 @@ void hrrn()
 {
     if (!executing)
     {
-        print_queue(procesos, cabeza, cola);
+        print_queue(procesos, cola);
         // Calcular response ratio de cada proceso
         int n = get_queue_length();
         float maxRR = 0;
@@ -546,7 +545,7 @@ void hrrn()
                 procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
         }
         printf("Evento %d terminado\n", evento.id);
-        dequeue(maxIndex, procesos, &cabeza, &cola);
+        dequeue(maxIndex, procesos, &cola);
         send_end(evento.type);
     }
 }
@@ -559,8 +558,8 @@ void mlfq()
         if (get_q0_length() != 0)
         {
             printf("\nMLFQ: Ejecutar evento de Q0 (quantum=5)\n");
-            print_queue(q0, cabeza_q0, cola_q0);
-            Evento e = dequeue(0, q0, &cabeza_q0, &cola_q0);
+            print_queue(q0, cola_q0);
+            Evento e = dequeue(0, q0, &cola_q0);
             send_start(e.type);
             // Asignar quantum o tiempo restante del proceso
             int execute_time = (e.remaining_time > quantum_q0) ? quantum_q0 : e.remaining_time;
@@ -587,14 +586,14 @@ void mlfq()
                 send_end(e.type);
                 for (int i = 0; i < get_queue_length(); i++)
                     if (procesos[i].id == e.id)
-                        dequeue(i, procesos, &cabeza, &cola);
+                        dequeue(i, procesos, &cola);
             }
         }
         else if (get_q1_length() != 0)
         {
             printf("\nMLFQ: Ejecutar evento de Q1 (quantum=8)\n");
-            print_queue(q1, cabeza_q1, cola_q1);
-            Evento e = dequeue(0, q1, &cabeza_q1, &cola_q1);
+            print_queue(q1, cola_q1);
+            Evento e = dequeue(0, q1, &cola_q1);
             send_start(e.type);
             // Asignar quantum o tiempo restante del proceso
             int execute_time = (e.remaining_time > quantum_q1) ? quantum_q1 : e.remaining_time;
@@ -621,14 +620,14 @@ void mlfq()
                 send_end(e.type);
                 for (int i = 0; i < get_queue_length(); i++)
                     if (procesos[i].id == e.id)
-                        dequeue(i, procesos, &cabeza, &cola);
+                        dequeue(i, procesos, &cola);
             }
         }
         else if (get_q2_length() != 0)
         {
             printf("\nMLFQ: Ejecutar evento de Q2 (FCFS)\n");
-            print_queue(q2, cabeza_q2, cola_q2);
-            Evento e = dequeue(0, q2, &cabeza_q2, &cola_q2);
+            print_queue(q2, cola_q2);
+            Evento e = dequeue(0, q2, &cola_q2);
             send_start(e.type);
             printf("Ejecutar evento %d en %d segundos\n", e.id, e.remaining_time);
             // Crear un thread con el evento y esperar a que éste termine
@@ -641,7 +640,7 @@ void mlfq()
             send_end(e.type);
             for (int i = 0; i < get_queue_length(); i++)
                 if (procesos[i].id == e.id)
-                    dequeue(i, procesos, &cabeza, &cola);
+                    dequeue(i, procesos, &cola);
         }
     }
 }
