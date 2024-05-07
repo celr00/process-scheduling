@@ -9,7 +9,17 @@
 
 #define SIZE 10000
 
-// ESTRUCTURA DE EVENTOS
+// ----- EVENTOS ------
+
+// Tipos de evento
+enum TipoEvento
+{
+    LIMPIEZA = 1,
+    ACTUALIZACION = 2,
+    ENVIO = 3
+};
+
+// Estructura de un evento
 typedef struct estructura
 {
     int id;
@@ -19,9 +29,24 @@ typedef struct estructura
     int turn_around_time;
     int waiting_time;
     float response_ratio;
+    enum TipoEvento type;
 } Evento;
 
-// VARIABLES GLOBALES
+// Obtener el tipo de evento
+char *getEventType(int type)
+{
+    switch (type)
+    {
+    case 1:
+        return "LIMPIEZA";
+    case 2:
+        return "ACTUALIZACION";
+    case 3:
+        return "ENVIO";
+    }
+}
+
+// ----- VARIABLES GLOBALES -----
 // Arreglo de eventos/peticiones que llegan por parte del cliente
 Evento procesos[SIZE];
 int cabeza = 0, cola = 0;
@@ -37,8 +62,12 @@ int quantum = 5;
 // Segundos actuales
 int currentSeconds = 0;
 int second_1 = 1;
+// Lista de clientes interesados
+int interesadosL[SIZE], interesadosA[SIZE], interesadosE[SIZE];
+// Algoritmo actual
+int currentAlgorithm = 1;
 
-// VARIABLES Y MÉTODOS PARA MLFQ
+// ----- VARIABLES Y MÉTODOS PARA MLFQ -----
 Evento q0[SIZE]; // High priority
 Evento q1[SIZE];
 Evento q2[SIZE]; // Low priority
@@ -48,7 +77,9 @@ int get_q0_length() { return cola_q0; }
 int get_q1_length() { return cola_q1; }
 int get_q2_length() { return cola_q2; }
 
-// IMPRIMIR EVENTOS QUE HAN LLEGADO POR PARTE DEL CLIENTE
+// ----- MANEJO DE EVENTOS -----
+
+// Imprimir eventos
 void print_queue(Evento q[], int head, int tail)
 {
     if (head != tail)
@@ -64,7 +95,7 @@ void print_queue(Evento q[], int head, int tail)
     }
 }
 
-// GUARDAR EVENTO DEL CLIENTE (para ejecutarse después con un algoritmo)
+// Guardar evento (para ejecutarse después con un algoritmo)
 void enqueue(Evento evento, Evento q[], int *tail)
 {
     if (*tail == SIZE)
@@ -78,7 +109,7 @@ void enqueue(Evento evento, Evento q[], int *tail)
     }
 }
 
-// ELIMINAR EVENTO DEL CLIENTE
+// Eliminar evento de una posición
 Evento dequeue(int index, Evento q[], int *head, int *tail)
 {
     if (*head != *tail)
@@ -93,13 +124,13 @@ Evento dequeue(int index, Evento q[], int *head, int *tail)
     }
 }
 
-// CANTIDAD DE EVENTOS DEL CLIENTE
+// Cantidad de eventos
 int get_queue_length()
 {
     return cola;
 }
 
-// MUESTRA SI HAY EVENTOS DEL CLIENTE
+// Muestra si la fila está vacía
 bool is_queue_empty()
 {
     if (cabeza == cola)
@@ -125,6 +156,8 @@ int getShortestJob()
     return minIndex;
 }
 
+// ----- MANEJO DE THREADS -----
+
 // Ejecución de thread
 void *sleep_process(void *sleeping_time)
 {
@@ -137,17 +170,207 @@ void *sleep_process(void *sleeping_time)
     pthread_exit(NULL);
 }
 
-// RECIBIR EVENTOS DEL CLIENTE
-void funcion_usr1(int sig, siginfo_t *info, void *secret)
+// ----- COMANDOS -----
+
+// Salir del programa (exit)
+void funcion_int_exit()
+{
+    printf("\nTerminando servidor.\n");
+    printf("Enviando señal de terminación a todos los clientes.\n");
+    // --- CODE HERE ---
+    exit(0);
+}
+
+// Añadir un cliente a la lista de interesados
+void add_event(int idCliente, int type)
+{
+    printf("Añadir cliente con ID %d a lista de interesados %s\n", idCliente, getEventType(type));
+    // --- CODE HERE ---
+}
+
+// Eliminar un cliente de la lista de interesados
+void remove_event(int idCliente, int type)
+{
+    printf("Eliminar cliente con ID %d de lista de interesados %s\n", idCliente, getEventType(type));
+    // --- CODE HERE ---
+}
+
+// Añadir un evento a la fila
+void trigger_event(int type)
 {
     int random_number = (rand() % 20) + 1; // Duración aleatoria
-    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0};
-    printf("Señal recibida de %d. Creando proceso...\tID %d\t\tBT: %d s / AT: %d s\n", getpgid(info->si_pid), globalID, random_number, currentSeconds);
+    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
+    printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
     enqueue(event, procesos, &cola);
-    // Agregar a queue de MLFQ
-    enqueue(event, q0, &cola_q0);
+    enqueue(event, q0, &cola_q0); // Agregar a queue de MLFQ
     globalID++;
 }
+
+// Lista clientes suscritos a un evento
+void list_event(int type)
+{
+    printf("Imprimir clientes de evento %s\n", getEventType(type));
+    // --- CODE HERE ---
+}
+
+// Listar algoritmos disponibles
+void list_algorithms()
+{
+    printf("Imprimir algoritmos disponibles.\n");
+    // --- CODE HERE ---
+}
+
+// Manejo de cambio de algoritmo
+void change_algorithm()
+{
+    int opc;
+    printf("1) First Come First Server (FCFS)\n");
+    printf("2) First In First Out (FIFO)\n");
+    printf("3) Round Robin (RR)\n");
+    printf("4) Shortest Job First (SJF)\n");
+    printf("5) Shortest Remaining Time (SRT)\n");
+    printf("6) Highest Response-Ratio Next (HRRN)\n");
+    printf("7) Multilevel Feedback Queues (MLFQ)\n");
+    scanf("%d", &opc);
+    if (opc < 1 || opc > 7)
+    {
+        printf("Opción inválida.\n");
+    }
+    else
+    {
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = opc;
+    }
+}
+
+// SIGUSR1: Cambio de algoritmo
+void funcion_usr1(int idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo.\n");
+    printf("Seleccione el tipo de algoritmo a cambiar.\n");
+    change_algorithm();
+}
+
+// Manejador de señal SIGTSTP (trigger event_name, list event_name, list algorithm_name)
+void funcion_tstp(int sig)
+{
+    int opc;
+    int event_name;
+    printf("\nSeleccione una opción\n");
+    printf("1) trigger event_name\n");
+    printf("2) list event_name\n");
+    printf("3) list algorithm_name\n");
+    scanf("%d", &opc);
+
+    switch (opc)
+    {
+    case 1:
+        printf("\nSeleccione el tipo de evento.\n");
+        printf("1) LIMPIEZA\n");
+        printf("2) ACTUALIZACION\n");
+        printf("3) ENVIO\n");
+        scanf("%d", &event_name);
+        if (event_name < 1 || event_name > 3)
+            printf("Opción inválida.\n");
+        else
+            trigger_event(event_name);
+        break;
+    case 2:
+        printf("\nSeleccione el tipo de evento\n");
+        printf("1) LIMPIEZA\n");
+        printf("2) ACTUALIZACION\n");
+        printf("3) ENVIO\n");
+        scanf("%d", &event_name);
+        if (event_name < 1 || event_name > 3)
+            printf("Opción inválida.\n");
+        else
+            trigger_event(event_name);
+        break;
+    case 3:
+        list_algorithms();
+        break;
+    default:
+        printf("Opción inválida.\n");
+        break;
+    }
+}
+
+// Manejador de SIGACTION
+void funcion_sigaction(int sig, siginfo_t *info, void *secret)
+{
+    int idCliente = getpgid(info->si_pid);
+    printf("\nSeñal recibida de cliente con ID %d.\n", idCliente);
+    if (sig == SIGALRM)
+    {
+        add_event(idCliente, 1);
+    }
+    else if (sig == SIGTERM)
+    {
+        add_event(idCliente, 2);
+    }
+    else if (sig == SIGHUP)
+    {
+        add_event(idCliente, 3);
+    }
+    else if (sig == SIGBUS)
+    {
+        remove_event(idCliente, 1);
+    }
+    else if (sig == SIGSEGV)
+    {
+        remove_event(idCliente, 2);
+    }
+    else if (sig == SIGUSR2)
+    {
+        remove_event(idCliente, 3);
+    }
+    else if (sig == SIGUSR1)
+    {
+        funcion_usr1(idCliente);
+    }
+}
+
+// Enviar señal SIGCONT a todos los clientes suscritos para notificar que un evento de un tipo comenzó
+void send_start(int tipoEvento)
+{
+    switch (tipoEvento)
+    {
+    case 1:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de LIMPIEZA comenzó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    case 2:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    case 3:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    }
+}
+
+// Enviar señal SIGUSR2 a todos los clientes suscritos para notificar que un evento de un tipo terminó
+void send_end(int tipoEvento)
+{
+    switch (tipoEvento)
+    {
+    case 1:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de LIMPIEZA terminó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    case 2:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    case 3:
+        printf("Enviar señal SIGUSR2 a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
+        // --- CODE HERE ---
+        break;
+    }
+}
+
+// ----- ALGORITMOS -----
 
 // FIRST COME FIRST SERVE
 void fcfs()
@@ -157,6 +380,7 @@ void fcfs()
         print_queue(procesos, cabeza, cola);
         Evento evento = dequeue(0, procesos, &cabeza, &cola);
         printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
@@ -164,6 +388,7 @@ void fcfs()
         pthread_join(id, NULL);
         executing = false;
         printf("Evento %d terminado\n", evento.id);
+        send_end(evento.type);
     }
 }
 
@@ -175,6 +400,7 @@ void fifo()
         print_queue(procesos, cabeza, cola);
         Evento evento = dequeue(0, procesos, &cabeza, &cola);
         printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
@@ -182,6 +408,7 @@ void fifo()
         pthread_join(id, NULL);
         executing = false;
         printf("Evento %d terminado\n", evento.id);
+        send_end(evento.type);
     }
 }
 
@@ -199,6 +426,7 @@ void round_robin()
         evento.remaining_time -= execute_time;
         // Ejecutar parte del proceso
         printf("RR: Ejecutar evento %d en %d segundos\n", evento.id, execute_time);
+        send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
@@ -215,6 +443,7 @@ void round_robin()
         else
         {
             printf("Evento %d terminado\n", evento.id);
+            send_end(evento.type);
         }
     }
 }
@@ -229,6 +458,7 @@ void sjf()
         int minIndex = getShortestJob();
         Evento event = procesos[minIndex];
         printf("SJF: Ejecutar evento %d en %d segundos\n", event.id, event.burst_time);
+        send_start(event.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
@@ -236,6 +466,8 @@ void sjf()
         pthread_join(id, NULL);
         executing = false;
         dequeue(minIndex, procesos, &cabeza, &cola);
+        printf("Evento %d terminado\n", event.id);
+        send_end(event.type);
     }
 }
 
@@ -252,6 +484,7 @@ void srt()
             currentEventId = evento->id;
             print_queue(procesos, cabeza, cola);
             printf("SRT: Cambiando a proceso %d con tiempo de ejecución: %d s\n", evento->id, evento->remaining_time);
+            send_start(evento->type);
         }
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
@@ -266,6 +499,7 @@ void srt()
         if (evento->remaining_time <= 0)
         {
             printf("Evento %d terminado\n", evento->id);
+            send_end(evento->type);
             dequeue(minIndex, procesos, &cabeza, &cola);
         }
     }
@@ -295,6 +529,7 @@ void hrrn()
         }
         Evento evento = procesos[maxIndex];
         printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
+        send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         for (int i = 0; i < evento.burst_time; i++)
@@ -313,6 +548,7 @@ void hrrn()
         }
         printf("Evento %d terminado\n", evento.id);
         dequeue(maxIndex, procesos, &cabeza, &cola);
+        send_end(evento.type);
     }
 }
 
@@ -326,6 +562,7 @@ void mlfq()
             printf("\nMLFQ: Ejecutar evento de Q0 (quantum=5)\n");
             print_queue(q0, cabeza_q0, cola_q0);
             Evento e = dequeue(0, q0, &cabeza_q0, &cola_q0);
+            send_start(e.type);
             // Asignar quantum o tiempo restante del proceso
             int execute_time = (e.remaining_time > quantum_q0) ? quantum_q0 : e.remaining_time;
             // Actualizar tiempo restante del proceso
@@ -348,6 +585,10 @@ void mlfq()
             else
             {
                 printf("Evento %d terminado\n", e.id);
+                send_end(e.type);
+                for (int i = 0; i < get_queue_length(); i++)
+                    if (procesos[i].id == e.id)
+                        dequeue(i, procesos, &cabeza, &cola);
             }
         }
         else if (get_q1_length() != 0)
@@ -355,6 +596,7 @@ void mlfq()
             printf("\nMLFQ: Ejecutar evento de Q1 (quantum=8)\n");
             print_queue(q1, cabeza_q1, cola_q1);
             Evento e = dequeue(0, q1, &cabeza_q1, &cola_q1);
+            send_start(e.type);
             // Asignar quantum o tiempo restante del proceso
             int execute_time = (e.remaining_time > quantum_q1) ? quantum_q1 : e.remaining_time;
             // Actualizar tiempo restante del proceso
@@ -377,6 +619,10 @@ void mlfq()
             else
             {
                 printf("Evento %d terminado\n", e.id);
+                send_end(e.type);
+                for (int i = 0; i < get_queue_length(); i++)
+                    if (procesos[i].id == e.id)
+                        dequeue(i, procesos, &cabeza, &cola);
             }
         }
         else if (get_q2_length() != 0)
@@ -384,6 +630,7 @@ void mlfq()
             printf("\nMLFQ: Ejecutar evento de Q2 (FCFS)\n");
             print_queue(q2, cabeza_q2, cola_q2);
             Evento e = dequeue(0, q2, &cabeza_q2, &cola_q2);
+            send_start(e.type);
             printf("Ejecutar evento %d en %d segundos\n", e.id, e.remaining_time);
             // Crear un thread con el evento y esperar a que éste termine
             executing = true;
@@ -392,31 +639,46 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Evento %d terminado\n", e.id);
+            send_end(e.type);
+            for (int i = 0; i < get_queue_length(); i++)
+                if (procesos[i].id == e.id)
+                    dequeue(i, procesos, &cabeza, &cola);
         }
     }
 }
 
-// PROGRAMA PRINCIPAL
+// ----- PROGRAMA PRINCIPAL -----
 int main()
 {
     // Semilla para números aleatorios
     srand(time(NULL));
 
-    // Manejador de señales de SIGUSR1 (Se usa sigaction para conocer quién mandó la señal)
+    // Manejador de señales (Se usa sigaction para conocer quién mandó la señal)
     struct sigaction s;
-    s.sa_sigaction = funcion_usr1;
+    s.sa_sigaction = funcion_sigaction;
     sigemptyset(&s.sa_mask);
     s.sa_flags = SA_SIGINFO;
+    sigaction(SIGALRM, &s, NULL);
+    sigaction(SIGTERM, &s, NULL);
+    sigaction(SIGHUP, &s, NULL);
+    sigaction(SIGBUS, &s, NULL);
+    sigaction(SIGSEGV, &s, NULL);
+    sigaction(SIGUSR2, &s, NULL);
     sigaction(SIGUSR1, &s, NULL);
+    signal(SIGTSTP, funcion_tstp);
+    signal(SIGINT, funcion_int_exit);
 
-    printf("Proceso con PID: %d\n", getpid());
+    printf("SERVIDOR. Proceso con PID: %d\n", getpid());
 
-    // Para pruebas
+    printf("\nSeleccione el algoritmo inicial.\n");
+    change_algorithm();
+
+    // Eventos de prueba
     Evento eventos[] = {
-        {1, 5, 5, 0, 0, 0, 0.0},
-        {2, 3, 3, 0, 0, 0, 0.0},
-        {3, 4, 4, 0, 0, 0, 0.0},
-        {4, 16, 16, 0, 0, 0, 0.0}};
+        {100, 5, 5, 0, 0, 0, 0.0, LIMPIEZA},
+        {200, 3, 3, 0, 0, 0, 0.0, LIMPIEZA},
+        {300, 4, 4, 0, 0, 0, 0.0, ENVIO},
+        {400, 16, 16, 0, 0, 0, 0.0, ACTUALIZACION}};
     enqueue(eventos[0], procesos, &cola);
     enqueue(eventos[1], procesos, &cola);
     enqueue(eventos[2], procesos, &cola);
@@ -430,21 +692,32 @@ int main()
 
     while (1)
     {
-        /* if (!is_queue_empty()) {
-            fcfs();
-            // fifo();
-            // round_robin();
-            // sjf();
-            // srt();
-            // hrrn();
-        } else {
-            pthread_t id;
-            pthread_create(&id, NULL, sleep_process, &second_1);
-            pthread_join(id, NULL);
-        } */
-        if (get_q0_length() != 0 || get_q1_length() != 0 || get_q2_length() != 0)
+        if (!is_queue_empty())
         {
-            mlfq();
+            switch (currentAlgorithm)
+            {
+            case 1:
+                fcfs();
+                break;
+            case 2:
+                fifo();
+                break;
+            case 3:
+                round_robin();
+                break;
+            case 4:
+                sjf();
+                break;
+            case 5:
+                srt();
+                break;
+            case 6:
+                hrrn();
+                break;
+            case 7:
+                mlfq();
+                break;
+            }
         }
         else
         {
