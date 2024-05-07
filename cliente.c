@@ -91,7 +91,7 @@ void event_end()
 
 int main()
 {
-    printf("PID del proceso: %d\n", getpid());
+    printf("CLIENTE. PID del proceso: %d\n", getpid());
 
     // Manejadores de señales
     signal(SIGCONT, event_start);
