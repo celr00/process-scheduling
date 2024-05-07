@@ -299,33 +299,19 @@ void funcion_sigaction(int sig, siginfo_t *info, void *secret)
 {
     printf("\nSeñal recibida de cliente con ID %d.\n", getpgid(info->si_pid));
     if (sig == SIGALRM)
-    {
         add_event(info->si_pid, 1);
-    }
     else if (sig == SIGTERM)
-    {
         add_event(info->si_pid, 2);
-    }
     else if (sig == SIGHUP)
-    {
         add_event(info->si_pid, 3);
-    }
     else if (sig == SIGBUS)
-    {
         remove_event(info->si_pid, 1);
-    }
     else if (sig == SIGSEGV)
-    {
         remove_event(info->si_pid, 2);
-    }
     else if (sig == SIGUSR2)
-    {
         remove_event(info->si_pid, 3);
-    }
     else if (sig == SIGUSR1)
-    {
         funcion_usr1(info->si_pid);
-    }
 }
 
 // Enviar señal SIGCONT a todos los clientes suscritos para notificar que un evento de un tipo comenzó
