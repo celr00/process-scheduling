@@ -219,35 +219,60 @@ void list_algorithms()
     // --- CODE HERE ---
 }
 
-// Manejo de cambio de algoritmo
-void change_algorithm()
-{
-    int opc;
-    printf("1) First Come First Server (FCFS)\n");
-    printf("2) First In First Out (FIFO)\n");
-    printf("3) Round Robin (RR)\n");
-    printf("4) Shortest Job First (SJF)\n");
-    printf("5) Shortest Remaining Time (SRT)\n");
-    printf("6) Highest Response-Ratio Next (HRRN)\n");
-    printf("7) Multilevel Feedback Queues (MLFQ)\n");
-    scanf("%d", &opc);
-    if (opc < 1 || opc > 7)
-    {
-        printf("Opción inválida.\n");
-    }
-    else
-    {
-        printf("\nCambiando algoritmo en próxima iteración.\n\n");
-        currentAlgorithm = opc;
-    }
-}
-
-// SIGUSR1: Cambio de algoritmo
+// Cambio de algoritmo a FCFS
 void funcion_usr1(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo.\n", getpgid(idCliente));
-    printf("Seleccione el tipo de algoritmo a cambiar.\n");
-    change_algorithm();
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a First Come First Serve.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 1;
+}
+
+// Cambio de algoritmo a FIFO
+void funcion_quit(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a FIFO.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 2;
+}
+
+// Cambio de algoritmo a Round Robin
+void funcion_ill(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Round Robin.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 3;
+}
+
+// Cambio de algoritmo a SJF
+void funcion_trap(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Job First.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 4;
+}
+
+// Cambio de algoritmo a SRT
+void funcion_abrt(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Remaining Time.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 5;
+}
+
+// Cambio de algoritmo a HRRN
+void funcion_fpe(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Highest Response-Ratio Next.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 6;
+}
+
+// Cambio de algoritmo a MLFQ
+void funcion_stkflt(pid_t idCliente)
+{
+    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Multilevel Feedback Queues.\n", getpgid(idCliente));
+    printf("\nCambiando algoritmo en próxima iteración.\n\n");
+    currentAlgorithm = 7;
 }
 
 // Manejador de señal SIGTSTP (trigger event_name, list event_name, list algorithm_name)
@@ -312,6 +337,18 @@ void funcion_sigaction(int sig, siginfo_t *info, void *secret)
         remove_event(info->si_pid, 3);
     else if (sig == SIGUSR1)
         funcion_usr1(info->si_pid);
+    else if (sig == SIGQUIT)
+        funcion_quit(info->si_pid);
+    else if (sig == SIGILL)
+        funcion_ill(info->si_pid);
+    else if (sig == SIGTRAP)
+        funcion_trap(info->si_pid);
+    else if (sig == SIGABRT)
+        funcion_abrt(info->si_pid);
+    else if (sig == SIGFPE)
+        funcion_fpe(info->si_pid);
+    else if (sig == SIGSTKFLT)
+        funcion_stkflt(info->si_pid);
 }
 
 // Enviar señal SIGCONT a todos los clientes suscritos para notificar que un evento de un tipo comenzó
@@ -649,13 +686,31 @@ int main()
     sigaction(SIGSEGV, &s, NULL);
     sigaction(SIGUSR2, &s, NULL);
     sigaction(SIGUSR1, &s, NULL);
+    sigaction(SIGQUIT, &s, NULL);
+    sigaction(SIGILL, &s, NULL);
+    sigaction(SIGTRAP, &s, NULL);
+    sigaction(SIGABRT, &s, NULL);
+    sigaction(SIGFPE, &s, NULL);
+    sigaction(SIGSTKFLT, &s, NULL);
     signal(SIGTSTP, funcion_tstp);
     signal(SIGINT, funcion_int_exit);
 
     printf("SERVIDOR. Proceso con PID: %d\n", getpid());
 
     printf("\nSeleccione el algoritmo inicial.\n");
-    change_algorithm();
+    int opc;
+    printf("1) First Come First Serve (FCFS)\n");
+    printf("2) First In First Out (FIFO)\n");
+    printf("3) Round Robin (RR)\n");
+    printf("4) Shortest Job First (SJF)\n");
+    printf("5) Shortest Remaining Time (SRT)\n");
+    printf("6) Highest Response-Ratio Next (HRRN)\n");
+    printf("7) Multilevel Feedback Queues (MLFQ)\n");
+    scanf("%d", &opc);
+    if (opc < 1 || opc > 7)
+        printf("Opción inválida.\n");
+    else
+        currentAlgorithm = opc;
 
     // Eventos de prueba
     Evento eventos[] = {
