@@ -177,7 +177,6 @@ void funcion_int_exit()
     printf("\nTerminando servidor.\n");
     printf("Enviando señal de terminación a todos los clientes.\n");
     // --- CODE HERE ---
-    // De los tres arreglos de interesados, enviar un kill -s INT a todos los clientes
     exit(0);
 }
 
@@ -408,12 +407,12 @@ void fcfs()
     {
         print_queue(procesos, cola);
         Evento evento = dequeue(0, procesos, &cola);
-        printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.remaining_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
+        pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
         printf("Evento %d terminado\n", evento.id);
@@ -428,12 +427,12 @@ void fifo()
     {
         print_queue(procesos, cola);
         Evento evento = dequeue(0, procesos, &cola);
-        printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.burst_time);
+        printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.remaining_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &evento.burst_time);
+        pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
         printf("Evento %d terminado\n", evento.id);
@@ -486,12 +485,12 @@ void sjf()
         // Encontrar trabajo más corto
         int minIndex = getShortestJob();
         Evento event = procesos[minIndex];
-        printf("SJF: Ejecutar evento %d en %d segundos\n", event.id, event.burst_time);
+        printf("SJF: Ejecutar evento %d en %d segundos\n", event.id, event.remaining_time);
         send_start(event.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &event.burst_time);
+        pthread_create(&id, NULL, sleep_process, &event.remaining_time);
         pthread_join(id, NULL);
         executing = false;
         dequeue(minIndex, procesos, &cola);
@@ -557,11 +556,11 @@ void hrrn()
             }
         }
         Evento evento = procesos[maxIndex];
-        printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.burst_time, evento.response_ratio);
+        printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.remaining_time, evento.response_ratio);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
-        for (int i = 0; i < evento.burst_time; i++)
+        for (int i = 0; i < evento.remaining_time; i++)
         {
             pthread_t id;
             pthread_create(&id, NULL, sleep_process, &second_1);
