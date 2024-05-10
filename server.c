@@ -195,8 +195,9 @@ void remove_event(pid_t idCliente, int type)
 }
 
 // Añadir un evento a la fila
-void trigger_event(int type)
+void trigger_event(pid_t idCliente, int type)
 {
+    printf("Cliente con ID %d ha enviado un evento de tipo %s\n", getpgid(idCliente), getEventType(type));
     int random_number = (rand() % 20) + 1; // Duración aleatoria
     Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
     printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
@@ -275,31 +276,19 @@ void funcion_stkflt(pid_t idCliente)
     currentAlgorithm = 7;
 }
 
-// Manejador de señal SIGTSTP (trigger event_name, list event_name, list algorithm_name)
+// Manejador de señal SIGTSTP (list event_name, list algorithm_name)
 void funcion_tstp(int sig)
 {
     int opc;
     int event_name;
     printf("\nSeleccione una opción\n");
-    printf("1) trigger event_name\n");
-    printf("2) list event_name\n");
-    printf("3) list algorithm_name\n");
+    printf("1) list event_name\n");
+    printf("2) list algorithm_name\n");
     scanf("%d", &opc);
 
     switch (opc)
     {
     case 1:
-        printf("\nSeleccione el tipo de evento.\n");
-        printf("1) LIMPIEZA\n");
-        printf("2) ACTUALIZACION\n");
-        printf("3) ENVIO\n");
-        scanf("%d", &event_name);
-        if (event_name < 1 || event_name > 3)
-            printf("Opción inválida.\n");
-        else
-            trigger_event(event_name);
-        break;
-    case 2:
         printf("\nSeleccione el tipo de evento\n");
         printf("1) LIMPIEZA\n");
         printf("2) ACTUALIZACION\n");
@@ -308,7 +297,7 @@ void funcion_tstp(int sig)
         if (event_name < 1 || event_name > 3)
             printf("Opción inválida.\n");
         else
-            trigger_event(event_name);
+            list_event(event_name);
         break;
     case 3:
         list_algorithms();
@@ -349,6 +338,12 @@ void funcion_sigaction(int sig, siginfo_t *info, void *secret)
         funcion_fpe(info->si_pid);
     else if (sig == SIGSTKFLT)
         funcion_stkflt(info->si_pid);
+    else if (sig == SIGTTIN)
+        trigger_event(info->si_pid, 1);
+    else if (sig == SIGTTOU)
+        trigger_event(info->si_pid, 2);
+    else if (sig == SIGURG)
+        trigger_event(info->si_pid, 3);
 }
 
 // Enviar señal SIGCONT a todos los clientes suscritos para notificar que un evento de un tipo comenzó
@@ -692,6 +687,9 @@ int main()
     sigaction(SIGABRT, &s, NULL);
     sigaction(SIGFPE, &s, NULL);
     sigaction(SIGSTKFLT, &s, NULL);
+    sigaction(SIGTTIN, &s, NULL);
+    sigaction(SIGTTOU, &s, NULL);
+    sigaction(SIGURG, &s, NULL);
     signal(SIGTSTP, funcion_tstp);
     signal(SIGINT, funcion_int_exit);
 

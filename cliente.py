@@ -40,8 +40,13 @@ def change_algorithm(algorithm):
         os.system("kill -s STKFLT {}".format(server_pid))
 
 def send_event(eventType):
-    print("Enviar (trigger) un evento al servidor")
+    server_pid = server_pid_txt.get()
+    if eventType == 1:
+        os.system("kill -s TTIN {}".format(server_pid))
     ### --- CODE HERE ---
+    # SIGTTIN for LIMPIEZA (1)
+    # SIGTTOU for ACTUALIZACION (2)
+    # SIGURG for ENVIO (3)
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
