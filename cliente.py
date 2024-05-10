@@ -8,6 +8,13 @@ import sys
 def funcion_int(sig, frame):
     sys.exit(0)
 
+def event_start(sig, frame):
+    results_label.config(text="Uno de los eventos a los que está suscrito ha comenzado su ejecución.")
+
+def event_end(sig, frame):
+    results_label.config(text="Uno de los eventos a los que está suscrito ha terminado su ejecución.")
+
+
 ### MANEJO DE COMANDOS ###
 
 def sub_event(eventType):
@@ -152,6 +159,8 @@ results_label.grid(row=0, column=0, sticky="nsew", pady=(0,10), padx=10)
 ### MANEJADOR DE SEÑALES ###
 
 signal.signal(signal.SIGINT, funcion_int)
+signal.signal(signal.SIGCONT, event_start)
+signal.signal(signal.SIGPIPE, event_end)
 
 
 ### DESPLEGAR VENTANA ###
