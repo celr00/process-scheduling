@@ -6,6 +6,9 @@
 1. gcc server.c -o server
 2. ./server
 
+### Para correr un cliente (en una terminal nueva)
+1. python cliente.py
+
 ---
 
 ## 2. Explicación de proyecto
