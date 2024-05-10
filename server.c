@@ -185,6 +185,8 @@ void add_event(pid_t idCliente, int type)
 {
     printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // --- CODE HERE ---
+    // Añadir ID del cliente (checar que no sea menos -1) a un arreglo de interesados (el arreglo aún no está, se tiene que crear)
+    // Para los arreglos, se pueden usar los métodos de enqueue y dequeue
 }
 
 // Eliminar un cliente de la lista de interesados
@@ -192,6 +194,8 @@ void remove_event(pid_t idCliente, int type)
 {
     printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // --- CODE HERE ---
+    // Eliminar ID del cliente (checar que no sea menos -1) de un arreglo de interesados (el arreglo aún no está, se tiene que crear)
+    // Para los arreglos, se pueden usar los métodos de enqueue y dequeue
 }
 
 // Añadir un evento a la fila
@@ -211,6 +215,7 @@ void list_event(int type)
 {
     printf("Imprimir clientes de evento %s\n", getEventType(type));
     // --- CODE HERE ---
+    // Imprimir el arreglo de X evento (el arreglo aún no está, se tiene que crear)
 }
 
 // Listar algoritmos disponibles
@@ -218,6 +223,7 @@ void list_algorithms()
 {
     printf("Imprimir algoritmos disponibles.\n");
     // --- CODE HERE ---
+    // Solamente imprimir la lista de algoritmos, como viene en el main más o menos
 }
 
 // Cambio de algoritmo a FCFS
@@ -354,14 +360,17 @@ void send_start(int tipoEvento)
     case 1:
         printf("Enviar señal SIGCONT a lista de clientes de que evento de LIMPIEZA comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de limpieza una señal SIGCONT
         break;
     case 2:
         printf("Enviar señal SIGCONT a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de actualización una señal SIGCONT
         break;
     case 3:
         printf("Enviar señal SIGCONT a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de envío una señal SIGCONT
         break;
     }
 }
@@ -374,14 +383,17 @@ void send_end(int tipoEvento)
     case 1:
         printf("Enviar señal SIGPIPE a lista de clientes de que evento de LIMPIEZA terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de limpieza una señal SIGPIPE
         break;
     case 2:
         printf("Enviar señal SIGPIPE a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de actualización una señal SIGPIPE
         break;
     case 3:
         printf("Enviar señal SIGPIPE a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
+        // Enviar a todos los clientes del arreglo de envío una señal SIGPIPE
         break;
     }
 }

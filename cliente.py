@@ -20,14 +20,17 @@ def event_end(sig, frame):
 def sub_event(eventType):
     print("Suscribir {}".format(eventType))
     ### --- CODE HERE ---
+    # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
 
 def unsub_event(eventType):
     print("Desuscribir {}".format(eventType))
     ### --- CODE HERE ---
+    # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
 
 def list_events():
     print("Listar eventos a los que el cliente está suscrito")
     ### --- CODE HERE ---
+    # Listar a qué eventos el cliente está suscrito (se podría guardar aquí internamente en un arreglo)
 
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
@@ -51,6 +54,7 @@ def send_event(eventType):
     if eventType == 1:
         os.system("kill -s TTIN {}".format(server_pid))
     ### --- CODE HERE ---
+    # Enviar señales al servidor según corresponda
     # SIGTTIN for LIMPIEZA (1)
     # SIGTTOU for ACTUALIZACION (2)
     # SIGURG for ENVIO (3)
