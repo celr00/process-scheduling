@@ -9,10 +9,10 @@ def funcion_int(sig, frame):
     sys.exit(0)
 
 def event_start(sig, frame):
-    results_label.config(text="Uno de los eventos a los que está suscrito ha comenzado su ejecución.")
+    results_label.config(text="Uno de los eventos a los que está suscrito ha comenzado su ejecución.", fg="black")
 
 def event_end(sig, frame):
-    results_label.config(text="Uno de los eventos a los que está suscrito ha terminado su ejecución.")
+    results_label.config(text="Uno de los eventos a los que está suscrito ha terminado su ejecución.", fg="black")
 
 
 ### MANEJO DE COMANDOS ###
@@ -34,30 +34,36 @@ def list_events():
 
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
-    if algorithm==1:
-        os.system("kill -s USR1 {}".format(server_pid))
-    elif algorithm==2:
-        os.system("kill -s QUIT {}".format(server_pid))
-    elif algorithm==3:
-        os.system("kill -s ILL {}".format(server_pid))
-    elif algorithm==4:
-        os.system("kill -s TRAP {}".format(server_pid))
-    elif algorithm==5:
-        os.system("kill -s ABRT {}".format(server_pid))
-    elif algorithm==6:
-        os.system("kill -s FPE {}".format(server_pid))
-    elif algorithm==7:
-        os.system("kill -s STKFLT {}".format(server_pid))
+    if not server_pid:
+        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+    else:
+        if algorithm==1:
+            os.system("kill -s USR1 {}".format(server_pid))
+        elif algorithm==2:
+            os.system("kill -s QUIT {}".format(server_pid))
+        elif algorithm==3:
+            os.system("kill -s ILL {}".format(server_pid))
+        elif algorithm==4:
+            os.system("kill -s TRAP {}".format(server_pid))
+        elif algorithm==5:
+            os.system("kill -s ABRT {}".format(server_pid))
+        elif algorithm==6:
+            os.system("kill -s FPE {}".format(server_pid))
+        elif algorithm==7:
+            os.system("kill -s STKFLT {}".format(server_pid))
 
 def send_event(eventType):
     server_pid = server_pid_txt.get()
-    if eventType == 1:
-        os.system("kill -s TTIN {}".format(server_pid))
-    ### --- CODE HERE ---
-    # Enviar señales al servidor según corresponda
-    # SIGTTIN for LIMPIEZA (1)
-    # SIGTTOU for ACTUALIZACION (2)
-    # SIGURG for ENVIO (3)
+    if not server_pid:
+        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+    else:
+        if eventType == 1:
+            os.system("kill -s TTIN {}".format(server_pid))
+        ### --- CODE HERE ---
+        # Enviar señales al servidor según corresponda
+        # SIGTTIN for LIMPIEZA (1)
+        # SIGTTOU for ACTUALIZACION (2)
+        # SIGURG for ENVIO (3)
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
