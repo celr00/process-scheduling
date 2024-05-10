@@ -20,3 +20,15 @@ PENDIENTE: Explicar cómo se resolvió cada requisito de la aplicación.
 ## 3. Video de funcionamiento
 
 URL a YouTube: PENDIENTE
+
+---
+
+## 4. Manejo de señales
+
+<table>
+    <tr>
+        <th>Signal</th>
+        <th>Servidor</th>
+        <th>Cliente</th>
+    </tr>
+</table>
