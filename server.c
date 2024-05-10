@@ -177,6 +177,7 @@ void funcion_int_exit()
     printf("\nTerminando servidor.\n");
     printf("Enviando señal de terminación a todos los clientes.\n");
     // --- CODE HERE ---
+    // De los tres arreglos de interesados, enviar un kill -s INT a todos los clientes
     exit(0);
 }
 
@@ -363,14 +364,14 @@ void send_start(int tipoEvento)
         // Enviar a todos los clientes del arreglo de limpieza una señal SIGCONT
         break;
     case 2:
-        printf("Enviar señal SIGCONT a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGXCPU a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de actualización una señal SIGCONT
+        // Enviar a todos los clientes del arreglo de actualización una señal SIGXCPU
         break;
     case 3:
-        printf("Enviar señal SIGCONT a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGXFSZ a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
         // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de envío una señal SIGCONT
+        // Enviar a todos los clientes del arreglo de envío una señal SIGXFSZ
         break;
     }
 }
@@ -386,14 +387,14 @@ void send_end(int tipoEvento)
         // Enviar a todos los clientes del arreglo de limpieza una señal SIGPIPE
         break;
     case 2:
-        printf("Enviar señal SIGPIPE a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGVTALRM a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de actualización una señal SIGPIPE
+        // Enviar a todos los clientes del arreglo de actualización una señal SIGVTALRM
         break;
     case 3:
-        printf("Enviar señal SIGPIPE a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
+        printf("Enviar señal SIGPROF a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
         // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de envío una señal SIGPIPE
+        // Enviar a todos los clientes del arreglo de envío una señal SIGPROF
         break;
     }
 }

@@ -9,10 +9,12 @@ def funcion_int(sig, frame):
     sys.exit(0)
 
 def event_start(sig, frame):
-    results_label.config(text="Uno de los eventos a los que está suscrito ha comenzado su ejecución.", fg="black")
+    eventType = "LIMPIEZA" if sig==signal.SIGCONT else "ACTUALIZACION" if sig==signal.SIGXCPU else "ENVIO" if sig==signal.SIGXFSZ else ""
+    results_label.config(text="Un evento de tipo {} ha comenzado su ejecución.".format(eventType), fg="black")
 
 def event_end(sig, frame):
-    results_label.config(text="Uno de los eventos a los que está suscrito ha terminado su ejecución.", fg="black")
+    eventType = "LIMPIEZA" if sig==signal.SIGPIPE else "ACTUALIZACION" if sig==signal.SIGVTALRM else "ENVIO" if sig==signal.SIGPROF else ""
+    results_label.config(text="Un evento de tipo {} ha terminado su ejecución.".format(eventType), fg="black")
 
 
 ### MANEJO DE COMANDOS ###
@@ -21,11 +23,13 @@ def sub_event(eventType):
     print("Suscribir {}".format(eventType))
     ### --- CODE HERE ---
     # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
+    # Poner mensaje en results_label de que se suscribió correctamente o algo.
 
 def unsub_event(eventType):
     print("Desuscribir {}".format(eventType))
     ### --- CODE HERE ---
     # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
+    # Poner mensaje en results_label de que se desuscribió correctamente o algo.
 
 def list_events():
     print("Listar eventos a los que el cliente está suscrito")
@@ -64,6 +68,7 @@ def send_event(eventType):
         # SIGTTIN for LIMPIEZA (1)
         # SIGTTOU for ACTUALIZACION (2)
         # SIGURG for ENVIO (3)
+        # Poner mensaje en results_label de que se envió al servidor o algo.
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
@@ -171,7 +176,11 @@ results_label.grid(row=0, column=0, sticky="nsew", pady=(0,10), padx=10)
 
 signal.signal(signal.SIGINT, funcion_int)
 signal.signal(signal.SIGCONT, event_start)
+signal.signal(signal.SIGXCPU, event_start)
+signal.signal(signal.SIGXFSZ, event_start)
 signal.signal(signal.SIGPIPE, event_end)
+signal.signal(signal.SIGVTALRM, event_end)
+signal.signal(signal.SIGPROF, event_end)
 
 
 ### DESPLEGAR VENTANA ###
