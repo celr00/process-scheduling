@@ -69,6 +69,7 @@ def send_event(eventType):
 
 window = tk.Tk()
 window.title("Cliente con PID {}".format(os.getpid()))
+window.option_add("*Button*Background", "#7FB3D5")
 
 # Obtener las dimensiones de la pantalla
 ancho_pantalla = window.winfo_screenwidth()
@@ -92,7 +93,7 @@ s1 = tk.Frame(window, bd=2, pady=10, padx=10)
 s1.grid(row=0, column=0, sticky="nsew")
 s1.columnconfigure(0, weight=1, uniform="a")
 
-tk.Label(s1, text="Escriba el PID del servidor...", font=("Verdana", 14)).grid(row=0, column=0, sticky="nsew", padx=10)
+tk.Label(s1, text="Escriba el PID del servidor...", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", padx=10)
 server_pid_txt = tk.Entry(s1, font=("Verdana", 14))
 server_pid_txt.grid(row=1, column=0, sticky="nsew", padx=10)
 
@@ -107,7 +108,7 @@ s2.columnconfigure((0,1,2), weight=1, uniform="a")
 sub_frame = tk.Frame(s2, padx=10)
 sub_frame.grid(row=0, column=0, sticky="nsew")
 sub_frame.columnconfigure(0, weight=1, uniform="a")
-tk.Label(sub_frame, text="sub event_name", font=("Verdana", 14)).grid(row=0, column=0, sticky="nsew", pady=(0,5))
+tk.Label(sub_frame, text="sub event_name", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", pady=(0,5))
 tk.Button(sub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:sub_event(1)).grid(row=1, column=0, sticky="nsew", pady=5)
 tk.Button(sub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:sub_event(2)).grid(row=2, column=0, sticky="nsew", pady=5)
 tk.Button(sub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:sub_event(3)).grid(row=3, column=0, sticky="nsew", pady=5)
@@ -116,7 +117,7 @@ tk.Button(sub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:sub_even
 unsub_frame = tk.Frame(s2, padx=10)
 unsub_frame.grid(row=0, column=1, sticky="nsew")
 unsub_frame.columnconfigure(0, weight=1, uniform="a")
-tk.Label(unsub_frame, text="unsub event_name", font=("Verdana", 14)).grid(row=0, column=0, sticky="nsew", pady=(0,5))
+tk.Label(unsub_frame, text="unsub event_name", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", pady=(0,5))
 tk.Button(unsub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:unsub_event(1)).grid(row=1, column=0, sticky="nsew", pady=5)
 tk.Button(unsub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:unsub_event(2)).grid(row=2, column=0, sticky="nsew", pady=5)
 tk.Button(unsub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:unsub_event(3)).grid(row=3, column=0, sticky="nsew", pady=5)
@@ -125,7 +126,7 @@ tk.Button(unsub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:unsub_
 liste_frame = tk.Frame(s2, padx=10)
 liste_frame.grid(row=0, column=2, sticky="nsew")
 liste_frame.columnconfigure(0, weight=1, uniform="a")
-tk.Label(liste_frame, text="list", font=("Verdana", 14)).grid(row=0, column=0, sticky="nsew", pady=(0,5))
+tk.Label(liste_frame, text="list", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", pady=(0,5))
 tk.Button(liste_frame, text='Mis suscripciones', font=("Verdana", 12), command=list_events).grid(row=1, column=0, sticky="nsew", pady=5)
 
 
@@ -134,7 +135,7 @@ s3 = tk.Frame(window, bd=2, pady=10, padx=10)
 s3.grid(row=2, column=0, sticky="nsew")
 s3.columnconfigure((0,1,2), weight=1, uniform="a")
 
-tk.Label(s3, text="Enviar un evento al servidor", font=("Verdana", 14)).grid(row=0, column=0, columnspan=3, sticky="nsew", pady=(0,5))
+tk.Label(s3, text="Enviar un evento al servidor", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, columnspan=3, sticky="nsew", pady=(0,5), padx=10)
 tk.Button(s3, text='LIMPIEZA', font=("Verdana", 12), command=lambda:send_event(1)).grid(row=1, column=0, sticky="nsew", pady=5, padx=10)
 tk.Button(s3, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:send_event(2)).grid(row=1, column=1, sticky="nsew", pady=5, padx=10)
 tk.Button(s3, text='ENVIO', font=("Verdana", 12), command=lambda:send_event(3)).grid(row=1, column=2, sticky="nsew", pady=5, padx=10)
@@ -146,7 +147,7 @@ s4 = tk.Frame(window, bd=2, pady=10, padx=10)
 s4.grid(row=3, column=0, sticky="nsew")
 s4.columnconfigure((0,1,2), weight=1, uniform="a")
 
-tk.Label(s4, text="Cambio de algoritmo", font=("Verdana", 14)).grid(row=0, column=0, columnspan=3, sticky="nsew", pady=(0,5))
+tk.Label(s4, text="Cambio de algoritmo", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, columnspan=3, sticky="nsew", pady=(0,5), padx=10)
 tk.Button(s4, text='First Come First Serve', font=("Verdana", 12), command=lambda:change_algorithm(1)).grid(row=1, column=0, sticky="nsew", pady=5, padx=10)
 tk.Button(s4, text='First In First Out', font=("Verdana", 12), command=lambda:change_algorithm(2)).grid(row=1, column=1, sticky="nsew", pady=5, padx=10)
 tk.Button(s4, text='Round Robin', font=("Verdana", 12), command=lambda:change_algorithm(3)).grid(row=1, column=2, sticky="nsew", pady=5, padx=10)
@@ -162,7 +163,7 @@ s5 = tk.Frame(window, bd=2, pady=10, padx=10)
 s5.grid(row=4, column=0, sticky="nsew")
 s5.columnconfigure(0, weight=1, uniform="a")
 
-results_label = tk.Label(s5, text="Prueba", font=("Verdana", 13), height=5, bg="white")
+results_label = tk.Label(s5, text="Esperando...", font=("Verdana", 13), height=5, bg="white", borderwidth=2, relief="solid")
 results_label.grid(row=0, column=0, sticky="nsew", pady=(0,10), padx=10)
 
 
