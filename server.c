@@ -408,7 +408,7 @@ void fcfs()
         print_queue(procesos, cola);
         Evento evento = dequeue(0, procesos, &cola);
         dequeue(0, q0, &cola_q0); // Eliminar de MLFQ
-        printf("FCFS: Ejecutar evento %d en %d segundos\n", evento.id, evento.remaining_time);
+        printf("FCFS: Ejecutar evento %d (%s) en %d segundos\n", evento.id, getEventType(evento.type), evento.remaining_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
@@ -429,7 +429,7 @@ void fifo()
         print_queue(procesos, cola);
         Evento evento = dequeue(0, procesos, &cola);
         dequeue(0, q0, &cola_q0); // Eliminar de MLFQ
-        printf("FIFO: Ejecutar evento %d en %d segundos\n", evento.id, evento.remaining_time);
+        printf("FIFO: Ejecutar evento %d (%s) en %d segundos\n", evento.id, getEventType(evento.type), evento.remaining_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
@@ -456,7 +456,7 @@ void round_robin()
         // Actualizar tiempo restante del proceso
         evento.remaining_time -= execute_time;
         // Ejecutar parte del proceso
-        printf("RR: Ejecutar evento %d en %d segundos\n", evento.id, execute_time);
+        printf("RR: Ejecutar evento %d (%s) en %d segundos\n", evento.id, getEventType(evento.type), execute_time);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
@@ -487,19 +487,19 @@ void sjf()
         print_queue(procesos, cola);
         // Encontrar trabajo más corto
         int minIndex = getShortestJob();
-        Evento event = procesos[minIndex];
-        printf("SJF: Ejecutar evento %d en %d segundos\n", event.id, event.remaining_time);
-        send_start(event.type);
+        Evento evento = procesos[minIndex];
+        printf("SJF: Ejecutar evento %d (%s) en %d segundos\n", evento.id, getEventType(evento.type), evento.remaining_time);
+        send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
         pthread_t id;
-        pthread_create(&id, NULL, sleep_process, &event.remaining_time);
+        pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
         dequeue(minIndex, procesos, &cola);
         dequeue(minIndex, q0, &cola_q0); // Eliminar de MLFQ
-        printf("Evento %d terminado\n", event.id);
-        send_end(event.type);
+        printf("Evento %d terminado\n", evento.id);
+        send_end(evento.type);
     }
 }
 
@@ -561,7 +561,7 @@ void hrrn()
             }
         }
         Evento evento = procesos[maxIndex];
-        printf("\nHRRN: Ejecutar evento %d en %d segundos (RR = %.3f)\n", evento.id, evento.remaining_time, evento.response_ratio);
+        printf("\nHRRN: Ejecutar evento %d (%s) en %d segundos (RR = %.3f)\n", evento.id, getEventType(evento.type), evento.remaining_time, evento.response_ratio);
         send_start(evento.type);
         // Crear un thread con el evento y esperar a que éste termine
         executing = true;
@@ -605,7 +605,7 @@ void mlfq()
             // Actualizar tiempo restante del proceso
             e.remaining_time -= execute_time;
             // Ejecutar parte del proceso
-            printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
+            printf("Ejecutar evento %d (%s) en %d segundos\n", e.id, getEventType(e.type), execute_time);
             // Crear un thread con el evento y esperar a que éste termine
             executing = true;
             pthread_t id;
@@ -640,7 +640,7 @@ void mlfq()
             // Actualizar tiempo restante del proceso
             e.remaining_time -= execute_time;
             // Ejecutar parte del proceso
-            printf("Ejecutar evento %d en %d segundos\n", e.id, execute_time);
+            printf("Ejecutar evento %d (%s) en %d segundos\n", e.id, getEventType(e.type), execute_time);
             // Crear un thread con el evento y esperar a que éste termine
             executing = true;
             pthread_t id;
@@ -670,7 +670,7 @@ void mlfq()
                 if (procesos[i].id == e.id)
                     dequeue(i, procesos, &cola);
             send_start(e.type);
-            printf("Ejecutar evento %d en %d segundos\n", e.id, e.remaining_time);
+            printf("Ejecutar evento %d (%s) en %d segundos\n", e.id, getEventType(e.type), e.remaining_time);
             // Crear un thread con el evento y esperar a que éste termine
             executing = true;
             pthread_t id;
