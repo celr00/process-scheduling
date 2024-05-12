@@ -55,6 +55,7 @@ def change_algorithm(algorithm):
             os.system("kill -s FPE {}".format(server_pid))
         elif algorithm==7:
             os.system("kill -s STKFLT {}".format(server_pid))
+        results_label.config(text="Algoritmo cambiado.", fg="black")
 
 def send_event(eventType):
     server_pid = server_pid_txt.get()
