@@ -317,7 +317,6 @@ void funcion_tstp(int sig)
 // Manejador de SIGACTION
 void funcion_sigaction(int sig, siginfo_t *info, void *secret)
 {
-    printf("\nSeñal recibida de cliente con ID %d.\n", getpgid(info->si_pid));
     if (sig == SIGALRM)
         add_event(info->si_pid, 1);
     else if (sig == SIGTERM)
