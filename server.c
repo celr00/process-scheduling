@@ -201,13 +201,17 @@ void remove_event(pid_t idCliente, int type)
 // Añadir un evento a la fila
 void trigger_event(pid_t idCliente, int type)
 {
-    printf("Cliente con ID %d ha enviado un evento de tipo %s\n", getpgid(idCliente), getEventType(type));
-    int random_number = (rand() % 20) + 1; // Duración aleatoria
-    Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
-    printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
-    enqueue(event, procesos, &cola);
-    enqueue(event, q0, &cola_q0); // Agregar a queue de MLFQ
-    globalID++;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("Cliente con ID %d ha enviado un evento de tipo %s\n", getpgid(idCliente), getEventType(type));
+        int random_number = (rand() % 20) + 1; // Duración aleatoria
+        Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
+        printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
+        enqueue(event, procesos, &cola);
+        enqueue(event, q0, &cola_q0); // Agregar a queue de MLFQ
+        globalID++;
+    }
 }
 
 // Lista clientes suscritos a un evento
@@ -229,57 +233,85 @@ void list_algorithms()
 // Cambio de algoritmo a FCFS
 void funcion_usr1(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a First Come First Serve.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 1;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a First Come First Serve.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 1;
+    }
 }
 
 // Cambio de algoritmo a FIFO
 void funcion_quit(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a FIFO.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 2;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a FIFO.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 2;
+    }
 }
 
 // Cambio de algoritmo a Round Robin
 void funcion_ill(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Round Robin.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 3;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Round Robin.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 3;
+    }
 }
 
 // Cambio de algoritmo a SJF
 void funcion_trap(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Job First.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 4;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Job First.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 4;
+    }
 }
 
 // Cambio de algoritmo a SRT
 void funcion_abrt(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Remaining Time.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 5;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Remaining Time.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 5;
+    }
 }
 
 // Cambio de algoritmo a HRRN
 void funcion_fpe(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Highest Response-Ratio Next.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 6;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Highest Response-Ratio Next.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 6;
+    }
 }
 
 // Cambio de algoritmo a MLFQ
 void funcion_stkflt(pid_t idCliente)
 {
-    printf("\nCliente con ID %d solicitó un cambio de algoritmo a Multilevel Feedback Queues.\n", getpgid(idCliente));
-    printf("\nCambiando algoritmo en próxima iteración.\n\n");
-    currentAlgorithm = 7;
+    int pid = getpgid(idCliente);
+    if (pid != -1)
+    {
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Multilevel Feedback Queues.\n", getpgid(idCliente));
+        printf("\nCambiando algoritmo en próxima iteración.\n\n");
+        currentAlgorithm = 7;
+    }
 }
 
 // Manejador de señal SIGTSTP (list event_name, list algorithm_name)
