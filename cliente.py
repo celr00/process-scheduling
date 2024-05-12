@@ -6,6 +6,7 @@ import sys
 ### MANEJO DE SEÑALES ###
 
 def funcion_int(sig, frame):
+    window.destroy()
     sys.exit(0)
 
 def event_start(sig, frame):
