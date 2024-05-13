@@ -42,10 +42,20 @@ def sub_event(eventType):
         results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
 
 def unsub_event(eventType):
-    print("Desuscribir {}".format(eventType))
-    ### --- CODE HERE ---
-    # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
-    # Poner mensaje en results_label de que se desuscribió correctamente o algo.
+    server_pid = server_pid_txt.get()
+    if not server_pid:
+        results_label.insert(tk.END, "ERR: Ingrese el PID del servidor primero.\n")
+    else:
+        print("Suscribir {}".format(eventType))
+        # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
+        # Poner mensaje en results_label de que se desuscribió correctamente o algo.
+        if eventType == "LIMPIEZA":
+            os.system("kill -s SIGBUS {}".format(server_pid))
+        elif eventType == "ACTUALIZACION":
+            os.system("kill -s SIGSEGV {}".format(server_pid))
+        elif eventType == "ENVIO":
+            os.system("kill -s SIGUSR2 {}".format(server_pid))
+
         if eventType in events:
             events.remove(eventType)    
         results_label.insert(tk.END, f"Se ha desuscrito al evento de {eventType}.\n")
