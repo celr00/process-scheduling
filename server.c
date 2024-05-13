@@ -180,39 +180,49 @@ void funcion_int_exit()
 {
     printf("\nTerminando servidor.\n");
     printf("Enviando señal de terminación a todos los clientes.\n");
-    //iterar hasta el tamaño de la lista de interesados
-    for(int i = 0; i < limpieza; i++){
-        kill(interesadosL[i], SIGTERM);
+    // Iterar hasta el tamaño de la lista de interesados
+    for (int i = 0; i < limpieza; i++)
+    {
+        kill(interesadosL[i], SIGKILL);
     }
-    for(int i = 0; i < actualizacion; i++){
-        kill(interesadosA[i], SIGTERM);
+    for (int i = 0; i < actualizacion; i++)
+    {
+        kill(interesadosA[i], SIGKILL);
     }
-    for(int i = 0; i < envio; i++){
-        kill(interesadosE[i], SIGTERM);
+    for (int i = 0; i < envio; i++)
+    {
+        kill(interesadosE[i], SIGKILL);
     }
     exit(0);
 }
 
 void enqueue_cliente(pid_t idCliente, int interesados[], int *rear)
 {
-    if(*rear == SIZE){
+    if (*rear == SIZE)
+    {
         printf("La lista de interesados está llena.\n");
-    } else {
+    }
+    else
+    {
         interesados[*rear] = idCliente;
         (*rear)++;
     }
-} 
+}
 
 void dequeue_cliente(pid_t idCliente, int interesados[], int *rear)
 {
-    if (*rear != 0) {
+    if (*rear != 0)
+    {
         bool foundClient = false;
-        for (int i=0; i<*rear; i++) {
-            if (foundClient) {
-                interesados[i] = interesados[i+1];
+        for (int i = 0; i < *rear; i++)
+        {
+            if (foundClient)
+            {
+                interesados[i] = interesados[i + 1];
             }
-            if (interesados[i] == idCliente) {
-                interesados[i] = interesados[i+1];
+            if (interesados[i] == idCliente)
+            {
+                interesados[i] = interesados[i + 1];
                 foundClient = true;
             }
         }
@@ -221,53 +231,54 @@ void dequeue_cliente(pid_t idCliente, int interesados[], int *rear)
 }
 
 // Añadir un cliente a la lista de interesados
-void add_event(pid_t idCliente, int type){
-    printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
+void add_event(pid_t idCliente, int type)
+{
     // Asegurar que el ID del cliente sea válido
-    if (idCliente != -1) {
+    if (getpgid(idCliente) != -1)
+    {
+        printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
         // Según el tipo de evento, añadir el cliente a la cola respectiva
-        switch (type) {
-            case LIMPIEZA:
-                enqueue_cliente(idCliente, interesadosL, &limpieza);
-                break;
-            case ACTUALIZACION:
-                enqueue_cliente(idCliente, interesadosA, &actualizacion);
-                break;
-            case ENVIO:
-                enqueue_cliente(idCliente, interesadosE, &envio);
-                break;
-            default:
-                printf("Tipo de evento inválido.\n");
-                break;
+        switch (type)
+        {
+        case LIMPIEZA:
+            enqueue_cliente(getpgid(idCliente), interesadosL, &limpieza);
+            break;
+        case ACTUALIZACION:
+            enqueue_cliente(getpgid(idCliente), interesadosA, &actualizacion);
+            break;
+        case ENVIO:
+            enqueue_cliente(getpgid(idCliente), interesadosE, &envio);
+            break;
+        default:
+            printf("Tipo de evento inválido.\n");
+            break;
         }
-    } else {
-        printf("ID de cliente inválido.\n");
     }
 }
 
 // Eliminar un cliente de la lista de interesados
 void remove_event(pid_t idCliente, int type)
 {
-    printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // Asegurar que el ID del cliente sea válido
-    if (idCliente != -1) {
+    if (getpgid(idCliente) != -1)
+    {
+        printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
         // Según el tipo de evento, buscar al cliente y eliminarlo de la lista de interesados
-        switch (type) {
-            case LIMPIEZA:
-                dequeue_cliente(idCliente, interesadosL, &limpieza);
-                break;
-            case ACTUALIZACION:
-                dequeue_cliente(idCliente, interesadosA, &actualizacion);
-                break;
-            case ENVIO:
-                dequeue_cliente(idCliente, interesadosE, &envio);
-                break;
-            default:
-                printf("Tipo de evento inválido.\n");
-                break;
+        switch (type)
+        {
+        case LIMPIEZA:
+            dequeue_cliente(getpgid(idCliente), interesadosL, &limpieza);
+            break;
+        case ACTUALIZACION:
+            dequeue_cliente(getpgid(idCliente), interesadosA, &actualizacion);
+            break;
+        case ENVIO:
+            dequeue_cliente(getpgid(idCliente), interesadosE, &envio);
+            break;
+        default:
+            printf("Tipo de evento inválido.\n");
+            break;
         }
-    } else {
-        printf("ID de cliente inválido.\n");
     }
 }
 
@@ -282,7 +293,7 @@ void trigger_event(pid_t idCliente, int type)
         Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
         printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
         enqueue(event, procesos, &cola); // Agregar a queue de procesos
-        enqueue(event, q0, &cola_q0); // Agregar a queue de MLFQ
+        enqueue(event, q0, &cola_q0);    // Agregar a queue de MLFQ
         globalID++;
     }
 }
@@ -292,27 +303,30 @@ void list_event(int type)
 {
     printf("Imprimir clientes de evento %s\n", getEventType(type));
     // Acceder al arreglo de interesados correspondiente al tipo de evento
-    switch (type) {
-        case LIMPIEZA:
-            for(int i = 0; i < limpieza; i++){
-                printf("Cliente %d\n", interesadosL[i]);
-            }
-            break;
-        case ACTUALIZACION:
-            for(int i = 0; i < actualizacion; i++){
-                printf("Cliente %d\n", interesadosA[i]);
-            }
-            break;
-        case ENVIO:
-            for(int i = 0; i < envio; i++){
-                printf("Cliente %d\n", interesadosE[i]);
-            }
-            break;
-        default:
-            printf("Tipo de evento inválido.\n");
-            return;
+    switch (type)
+    {
+    case LIMPIEZA:
+        for (int i = 0; i < limpieza; i++)
+        {
+            printf("Cliente %d\n", interesadosL[i]);
+        }
+        break;
+    case ACTUALIZACION:
+        for (int i = 0; i < actualizacion; i++)
+        {
+            printf("Cliente %d\n", interesadosA[i]);
+        }
+        break;
+    case ENVIO:
+        for (int i = 0; i < envio; i++)
+        {
+            printf("Cliente %d\n", interesadosE[i]);
+        }
+        break;
+    default:
+        printf("Tipo de evento inválido.\n");
+        return;
     }
-    
 }
 
 // Listar algoritmos disponibles
@@ -487,24 +501,30 @@ void send_start(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        for (int i = 0; i < limpieza; i++) { //El evento de LIMPIEZA comenzó
-            if (interesadosL[i] != -1) {
+        for (int i = 0; i < limpieza; i++)
+        { // El evento de LIMPIEZA comenzó
+            if (interesadosL[i] != -1)
+            {
                 kill(interesadosL[i], SIGCONT);
             }
         }
         break;
     case 2:
-        for(int i = 0; i < actualizacion; i++){ //El evento de ACTUALIZACIÓN comenzó
-            if(interesadosA[i]!= -1){
+        for (int i = 0; i < actualizacion; i++)
+        { // El evento de ACTUALIZACIÓN comenzó
+            if (interesadosA[i] != -1)
+            {
                 kill(interesadosA[i], SIGXCPU);
             }
         }
         break;
     case 3:
-        for(int i = 0; i < envio; i++){ //El evento de ENVÍO comenzó
-            if(interesadosE[i]!=-1){
+        for (int i = 0; i < envio; i++)
+        { // El evento de ENVÍO comenzó
+            if (interesadosE[i] != -1)
+            {
                 kill(interesadosE[i], SIGXFSZ);
-            }   
+            }
         }
         break;
     }
@@ -516,24 +536,30 @@ void send_end(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        for (int i = 0; i < limpieza; i++) { //El evento de LIMPIEZA terminó
-            if (interesadosL[i] != -1) {
+        for (int i = 0; i < limpieza; i++)
+        { // El evento de LIMPIEZA terminó
+            if (interesadosL[i] != -1)
+            {
                 kill(interesadosL[i], SIGPIPE);
             }
         }
         break;
     case 2:
-        for(int i = 0; i < actualizacion; i++){ //El evento de ACTUALIZACIÓN terminó
-            if(interesadosA[i]!= -1){
+        for (int i = 0; i < actualizacion; i++)
+        { // El evento de ACTUALIZACIÓN terminó
+            if (interesadosA[i] != -1)
+            {
                 kill(interesadosA[i], SIGVTALRM);
             }
         }
         break;
     case 3:
-        for(int i = 0; i < envio; i++){ //El evento de ENVÍO terminó
-            if(interesadosE[i]!=-1){
+        for (int i = 0; i < envio; i++)
+        { // El evento de ENVÍO terminó
+            if (interesadosE[i] != -1)
+            {
                 kill(interesadosE[i], SIGWINCH);
-            }     
+            }
         }
         break;
     }
