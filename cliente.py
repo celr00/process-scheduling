@@ -14,12 +14,11 @@ def funcion_int(sig, frame):
 
 def event_start(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGCONT else "ACTUALIZACION" if sig==signal.SIGXCPU else "ENVIO" if sig==signal.SIGXFSZ else ""
-    results_label.config(text="Un evento de tipo {} ha comenzado su ejecución.".format(eventType), fg="black")
+    results_label.insert(tk.END, "Un evento de tipo {} ha comenzado su ejecución.\n".format(eventType))
 
 def event_end(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGPIPE else "ACTUALIZACION" if sig==signal.SIGVTALRM else "ENVIO" if sig==signal.SIGPROF else ""
-    results_label.config(text="Un evento de tipo {} ha terminado su ejecución.".format(eventType), fg="black")
-
+    results_label.insert(tk.END, "Un evento de tipo {} ha terminado su ejecución.\n".format(eventType))
 
 ### MANEJO DE COMANDOS ###
 
@@ -50,7 +49,7 @@ def list_events():
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
     if not server_pid:
-        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+        results_label.insert(tk.END, "Ingrese el PID del servidor primero.\n")
     else:
         if algorithm==1:
             os.system("kill -s USR1 {}".format(server_pid))
@@ -66,12 +65,12 @@ def change_algorithm(algorithm):
             os.system("kill -s FPE {}".format(server_pid))
         elif algorithm==7:
             os.system("kill -s STKFLT {}".format(server_pid))
-        results_label.config(text="Algoritmo cambiado.", fg="black")
+        results_label.insert(tk.END, f"Algoritmo cambiado.\n")
 
 def send_event(eventType):
     server_pid = server_pid_txt.get()
     if not server_pid:
-        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+        results_label.insert(tk.END, "Ingrese el PID del servidor primero.\n")
     else:
         if eventType == 1:
             os.system("kill -s TTIN {}".format(server_pid))
