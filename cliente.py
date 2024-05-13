@@ -3,6 +3,9 @@ import os
 import signal
 import sys
 
+### EVENTOS ###
+events = []
+
 ### MANEJO DE SEÑALES ###
 
 def funcion_int(sig, frame):
@@ -11,36 +14,62 @@ def funcion_int(sig, frame):
 
 def event_start(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGCONT else "ACTUALIZACION" if sig==signal.SIGXCPU else "ENVIO" if sig==signal.SIGXFSZ else ""
-    results_label.config(text="Un evento de tipo {} ha comenzado su ejecución.".format(eventType), fg="black")
+    results_label.insert(tk.END, "Un evento de tipo {} ha comenzado su ejecución.\n".format(eventType))
 
 def event_end(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGPIPE else "ACTUALIZACION" if sig==signal.SIGVTALRM else "ENVIO" if sig==signal.SIGPROF else ""
-    results_label.config(text="Un evento de tipo {} ha terminado su ejecución.".format(eventType), fg="black")
-
+    results_label.insert(tk.END, "Un evento de tipo {} ha terminado su ejecución.\n".format(eventType))
 
 ### MANEJO DE COMANDOS ###
 
 def sub_event(eventType):
-    print("Suscribir {}".format(eventType))
-    ### --- CODE HERE ---
-    # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
-    # Poner mensaje en results_label de que se suscribió correctamente o algo.
+    server_pid = server_pid_txt.get()
+    if not server_pid:
+        results_label.insert(tk.END, "ERR: Ingrese el PID del servidor primero.\n")
+    else:
+        print("Suscribir {}".format(eventType))
+        # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
+        # Poner mensaje en results_label de que se suscribió correctamente o algo.
+        if eventType == "LIMPIEZA":
+            os.system("kill -s SIGBUS {}".format(server_pid))
+        elif eventType == "ACTUALIZACION":
+            os.system("kill -s SIGSEGV {}".format(server_pid))
+        elif eventType == "ENVIO":
+            os.system("kill -s SIGUSR2 {}".format(server_pid))
+
+        if eventType not in events:
+            events.append(eventType)
+        results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
 
 def unsub_event(eventType):
-    print("Desuscribir {}".format(eventType))
-    ### --- CODE HERE ---
-    # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
-    # Poner mensaje en results_label de que se desuscribió correctamente o algo.
+    server_pid = server_pid_txt.get()
+    if not server_pid:
+        results_label.insert(tk.END, "ERR: Ingrese el PID del servidor primero.\n")
+    else:
+        print("Suscribir {}".format(eventType))
+        # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
+        # Poner mensaje en results_label de que se desuscribió correctamente o algo.
+        if eventType == "LIMPIEZA":
+            os.system("kill -s SIGBUS {}".format(server_pid))
+        elif eventType == "ACTUALIZACION":
+            os.system("kill -s SIGSEGV {}".format(server_pid))
+        elif eventType == "ENVIO":
+            os.system("kill -s SIGUSR2 {}".format(server_pid))
+
+        if eventType in events:
+            events.remove(eventType)    
+        results_label.insert(tk.END, f"Se ha desuscrito al evento de {eventType}.\n")
 
 def list_events():
     print("Listar eventos a los que el cliente está suscrito")
-    ### --- CODE HERE ---
     # Listar a qué eventos el cliente está suscrito (se podría guardar aquí internamente en un arreglo)
+    msg = ", ".join(events)
+    results_label.insert(tk.END, f"Suscrito a: {msg}.\n")
 
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
     if not server_pid:
-        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+        results_label.insert(tk.END, "Ingrese el PID del servidor primero.\n")
     else:
         if algorithm==1:
             os.system("kill -s USR1 {}".format(server_pid))
@@ -56,12 +85,12 @@ def change_algorithm(algorithm):
             os.system("kill -s FPE {}".format(server_pid))
         elif algorithm==7:
             os.system("kill -s STKFLT {}".format(server_pid))
-        results_label.config(text="Algoritmo cambiado.", fg="black")
+        results_label.insert(tk.END, f"Algoritmo cambiado.\n")
 
 def send_event(eventType):
     server_pid = server_pid_txt.get()
     if not server_pid:
-        results_label.config(text="Ingrese el PID del servidor primero.", fg="red")
+        results_label.insert(tk.END, "Ingrese el PID del servidor primero.\n")
     else:
         if eventType == 1:
             os.system("kill -s TTIN {}".format(server_pid))
@@ -170,7 +199,8 @@ s5 = tk.Frame(window, bd=2, pady=10, padx=10)
 s5.grid(row=4, column=0, sticky="nsew")
 s5.columnconfigure(0, weight=1, uniform="a")
 
-results_label = tk.Label(s5, text="Esperando...", font=("Verdana", 13), height=5, bg="white", borderwidth=2, relief="solid")
+results_label = tk.Text(s5, font=("Verdana", 13), height=5, bg="white", borderwidth=2, relief="solid")
+results_label.insert(tk.END, f"Esperando...\n")
 results_label.grid(row=0, column=0, sticky="nsew", pady=(0,10), padx=10)
 
 
