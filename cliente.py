@@ -23,10 +23,20 @@ def event_end(sig, frame):
 ### MANEJO DE COMANDOS ###
 
 def sub_event(eventType):
-    print("Suscribir {}".format(eventType))
-    ### --- CODE HERE ---
-    # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
-    # Poner mensaje en results_label de que se suscribió correctamente o algo.
+    server_pid = server_pid_txt.get()
+    if not server_pid:
+        results_label.insert(tk.END, "ERR: Ingrese el PID del servidor primero.\n")
+    else:
+        print("Suscribir {}".format(eventType))
+        # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
+        # Poner mensaje en results_label de que se suscribió correctamente o algo.
+        if eventType == "LIMPIEZA":
+            os.system("kill -s SIGBUS {}".format(server_pid))
+        elif eventType == "ACTUALIZACION":
+            os.system("kill -s SIGSEGV {}".format(server_pid))
+        elif eventType == "ENVIO":
+            os.system("kill -s SIGUSR2 {}".format(server_pid))
+
         if eventType not in events:
             events.append(eventType)
         results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
