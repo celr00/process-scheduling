@@ -31,11 +31,11 @@ def sub_event(eventType):
         # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
         # Poner mensaje en results_label de que se suscribió correctamente o algo.
         if eventType == "LIMPIEZA":
-            os.system("kill -s SIGBUS {}".format(server_pid))
+            os.system("kill -s ALRM {}".format(server_pid))
         elif eventType == "ACTUALIZACION":
-            os.system("kill -s SIGSEGV {}".format(server_pid))
+            os.system("kill -s TERM {}".format(server_pid))
         elif eventType == "ENVIO":
-            os.system("kill -s SIGUSR2 {}".format(server_pid))
+            os.system("kill -s HUP {}".format(server_pid))
 
         if eventType not in events:
             events.append(eventType)
@@ -46,15 +46,15 @@ def unsub_event(eventType):
     if not server_pid:
         results_label.insert(tk.END, "ERR: Ingrese el PID del servidor primero.\n")
     else:
-        print("Suscribir {}".format(eventType))
+        print("Desuscribir {}".format(eventType))
         # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
         # Poner mensaje en results_label de que se desuscribió correctamente o algo.
         if eventType == "LIMPIEZA":
-            os.system("kill -s SIGBUS {}".format(server_pid))
+            os.system("kill -s BUS {}".format(server_pid))
         elif eventType == "ACTUALIZACION":
-            os.system("kill -s SIGSEGV {}".format(server_pid))
+            os.system("kill -s SEGV {}".format(server_pid))
         elif eventType == "ENVIO":
-            os.system("kill -s SIGUSR2 {}".format(server_pid))
+            os.system("kill -s USR2 {}".format(server_pid))
 
         if eventType in events:
             events.remove(eventType)    
@@ -145,18 +145,18 @@ sub_frame = tk.Frame(s2, padx=10)
 sub_frame.grid(row=0, column=0, sticky="nsew")
 sub_frame.columnconfigure(0, weight=1, uniform="a")
 tk.Label(sub_frame, text="sub event_name", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", pady=(0,5))
-tk.Button(sub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:sub_event(1)).grid(row=1, column=0, sticky="nsew", pady=5)
-tk.Button(sub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:sub_event(2)).grid(row=2, column=0, sticky="nsew", pady=5)
-tk.Button(sub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:sub_event(3)).grid(row=3, column=0, sticky="nsew", pady=5)
+tk.Button(sub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:sub_event("LIMPIEZA")).grid(row=1, column=0, sticky="nsew", pady=5)
+tk.Button(sub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:sub_event("ACTUALIZACION")).grid(row=2, column=0, sticky="nsew", pady=5)
+tk.Button(sub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:sub_event("ENVIO")).grid(row=3, column=0, sticky="nsew", pady=5)
 
 # Desuscribirse de un evento
 unsub_frame = tk.Frame(s2, padx=10)
 unsub_frame.grid(row=0, column=1, sticky="nsew")
 unsub_frame.columnconfigure(0, weight=1, uniform="a")
 tk.Label(unsub_frame, text="unsub event_name", font=("Verdana", 14), bg="#372FAF", fg="white").grid(row=0, column=0, sticky="nsew", pady=(0,5))
-tk.Button(unsub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:unsub_event(1)).grid(row=1, column=0, sticky="nsew", pady=5)
-tk.Button(unsub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:unsub_event(2)).grid(row=2, column=0, sticky="nsew", pady=5)
-tk.Button(unsub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:unsub_event(3)).grid(row=3, column=0, sticky="nsew", pady=5)
+tk.Button(unsub_frame, text='LIMPIEZA', font=("Verdana", 12), command=lambda:unsub_event("LIMPIEZA")).grid(row=1, column=0, sticky="nsew", pady=5)
+tk.Button(unsub_frame, text='ACTUALIZACION', font=("Verdana", 12), command=lambda:unsub_event("ACTUALIZACION")).grid(row=2, column=0, sticky="nsew", pady=5)
+tk.Button(unsub_frame, text='ENVIO', font=("Verdana", 12), command=lambda:unsub_event("ENVIO")).grid(row=3, column=0, sticky="nsew", pady=5)
 
 # Ver eventos a los que me encuentro suscrito
 liste_frame = tk.Frame(s2, padx=10)
