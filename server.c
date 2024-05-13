@@ -857,7 +857,7 @@ void mlfq()
         }
         else if (get_q1_length() != 0)
         {
-            printf("\nMLFQ: Ejecutar evento de Q1 (quantum=8)\n");
+            printf("\nMLFQ: Ejecutar evento de Q1 (quantum=10)\n");
             print_queue(q1, cola_q1);
             Evento e = dequeue(0, q1, &cola_q1);
             for (int i = 0; i < get_queue_length(); i++) // Eliminar de procesos generales
