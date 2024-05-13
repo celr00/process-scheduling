@@ -57,7 +57,7 @@ def unsub_event(eventType):
             os.system("kill -s USR2 {}".format(server_pid))
 
         if eventType in events:
-            events.remove(eventType)    
+            events.remove(eventType)
         results_label.insert(tk.END, f"Se ha desuscrito al evento de {eventType}.\n")
 
 def list_events():
@@ -94,12 +94,12 @@ def send_event(eventType):
     else:
         if eventType == 1:
             os.system("kill -s TTIN {}".format(server_pid))
-        ### --- CODE HERE ---
-        # Enviar señales al servidor según corresponda
-        # SIGTTIN for LIMPIEZA (1)
-        # SIGTTOU for ACTUALIZACION (2)
-        # SIGURG for ENVIO (3)
-        # Poner mensaje en results_label de que se envió al servidor o algo.
+        if eventType == 2:
+            os.system("kill -s SIGTTOU {}".format(server_pid))
+        if eventType == 3:
+            os.system("kill -s SIGURG {}".format(server_pid))
+        eventTypeStr = "LIMPIEZA" if eventType==1 else "ACTUALIZACION" if eventType==2 else "ENVIO" if eventType==3 else ""
+        results_label.insert(tk.END, f"Evento de tipo {eventTypeStr} enviado al servidor.\n")
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
