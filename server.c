@@ -62,7 +62,7 @@ int quantum = 5;
 int currentSeconds = 0;
 int second_1 = 1;
 // Lista de clientes interesados
-int interesadosL[SIZE], interesadosA[SIZE], interesadosE[SIZE];
+int interesadosL[SIZE]={-1}, interesadosA[SIZE]={-1}, interesadosE[SIZE]={-1};
 // Algoritmo actual
 int currentAlgorithm = 1;
 
@@ -176,7 +176,17 @@ void funcion_int_exit()
 {
     printf("\nTerminando servidor.\n");
     printf("Enviando señal de terminación a todos los clientes.\n");
-    // --- CODE HERE ---
+    for (int i = 0; i < SIZE; i++){
+        if (interesadosL[i] != -1){
+            kill(interesadosL[i], SIGKILL);
+        }
+        if (interesadosA[i] != -1){
+            kill(interesadosA[i], SIGKILL);
+        }
+        if (interesadosE[i] != -1){
+            kill(interesadosE[i], SIGKILL);
+        }
+    }
     exit(0);
 }
 
@@ -184,18 +194,88 @@ void funcion_int_exit()
 void add_event(pid_t idCliente, int type)
 {
     printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
-    // --- CODE HERE ---
-    // Añadir ID del cliente (checar que no sea menos -1) a un arreglo de interesados (el arreglo aún no está, se tiene que crear)
-    // Para los arreglos, se pueden usar los métodos de enqueue y dequeue
+    // Asegurar que el ID del cliente sea válido
+    if (idCliente != -1) {
+        // Según el tipo de evento, añadir el cliente a la cola respectiva
+        switch (type) {
+            case LIMPIEZA:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosL[i] == -1) {
+                        interesadosL[i] = idCliente;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en limpieza está llena.\n");
+                break;
+            case ACTUALIZACION:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosA[i] == -1) {
+                        interesadosA[i] = idCliente;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en actualización está llena.\n");
+                break;
+            case ENVIO:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosE[i] == -1) {
+                        interesadosE[i] = idCliente;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en envío está llena.\n");
+                break;
+            default:
+                printf("Tipo de evento inválido.\n");
+                break;
+        }
+    } else {
+        printf("ID de cliente inválido.\n");
+    }
 }
 
 // Eliminar un cliente de la lista de interesados
 void remove_event(pid_t idCliente, int type)
 {
     printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
-    // --- CODE HERE ---
-    // Eliminar ID del cliente (checar que no sea menos -1) de un arreglo de interesados (el arreglo aún no está, se tiene que crear)
-    // Para los arreglos, se pueden usar los métodos de enqueue y dequeue
+    // Asegurar que el ID del cliente sea válido
+    if (idCliente != -1) {
+        // Según el tipo de evento, buscar al cliente y eliminarlo de la lista de interesados
+        switch (type) {
+            case LIMPIEZA:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosL[i] == idCliente) {
+                        interesadosL[i] = -1;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en limpieza está llena.\n");
+                break;
+            case ACTUALIZACION:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosA[i] == idCliente) {
+                        interesadosA[i] = -1;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en actualización está llena.\n");
+                break;
+            case ENVIO:
+                for (int i = 0; i < SIZE; i++) {
+                    if (interesadosE[i] == idCliente) {
+                        interesadosE[i] = -1;
+                        return; 
+                    }
+                }
+                printf("La cola de interesados en envío está llena.\n");
+                break;
+            default:
+                printf("Tipo de evento inválido.\n");
+                break;
+        }
+    } else {
+        printf("ID de cliente inválido.\n");
+    }
 }
 
 // Añadir un evento a la fila
@@ -218,16 +298,41 @@ void trigger_event(pid_t idCliente, int type)
 void list_event(int type)
 {
     printf("Imprimir clientes de evento %s\n", getEventType(type));
-    // --- CODE HERE ---
-    // Imprimir el arreglo de X evento (el arreglo aún no está, se tiene que crear)
+    // Acceder al arreglo de interesados correspondiente al tipo de evento
+    pid_t *interesados;
+    switch (type) {
+        case LIMPIEZA:
+            interesados = interesadosL;
+            break;
+        case ACTUALIZACION:
+            interesados = interesadosA;
+            break;
+        case ENVIO:
+            interesados = interesadosE;
+            break;
+        default:
+            printf("Tipo de evento inválido.\n");
+            return;
+    }
+    // Imprimir la lista de clientes suscritos al evento
+    for(int i = 0; i < SIZE; i++) {
+        if (interesados[i] != -1) {
+            printf("ID Cliente: %d\n", interesados[i]);
+        }
+    }
 }
 
 // Listar algoritmos disponibles
 void list_algorithms()
 {
-    printf("Imprimir algoritmos disponibles.\n");
-    // --- CODE HERE ---
-    // Solamente imprimir la lista de algoritmos, como viene en el main más o menos
+    printf("Algoritmos disponibles:\n");
+    printf("1) First Come First Serve (FCFS)\n");
+    printf("2) First In First Out (FIFO)\n");
+    printf("3) Round Robin (RR)\n");
+    printf("4) Shortest Job First (SJF)\n");
+    printf("5) Shortest Remaining Time (SRT)\n");
+    printf("6) Highest Response-Ratio Next (HRRN)\n");
+    printf("7) Multilevel Feedback Queues (MLFQ)\n");
 }
 
 // Cambio de algoritmo a FCFS
@@ -389,19 +494,25 @@ void send_start(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        printf("Enviar señal SIGCONT a lista de clientes de que evento de LIMPIEZA comenzó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de limpieza una señal SIGCONT
+        for (int i = 0; i < SIZE; i++) { //El evento de LIMPIEZA comenzó
+            if (interesadosL[i] != -1) {
+                kill(interesadosL[i], SIGCONT);
+            }
+        }
         break;
     case 2:
-        printf("Enviar señal SIGXCPU a lista de clientes de que evento de ACTUALIZACION comenzó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de actualización una señal SIGXCPU
+        for(int i = 0; i < SIZE; i++){ //El evento de ACTUALIZACIÓN comenzó
+            if(interesadosA[i]!= -1){
+                kill(interesadosA[i], SIGXCPU);
+            }
+        }
         break;
     case 3:
-        printf("Enviar señal SIGXFSZ a lista de clientes de que evento de ENVIO comenzó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de envío una señal SIGXFSZ
+        for(int i = 0; i < SIZE; i++){ //El evento de ENVÍO comenzó
+            if(interesadosE[i]!=-1){
+                kill(interesadosE[i], SIGXFSZ);
+            }   
+        }
         break;
     }
 }
@@ -412,19 +523,25 @@ void send_end(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        printf("Enviar señal SIGPIPE a lista de clientes de que evento de LIMPIEZA terminó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de limpieza una señal SIGPIPE
+        for (int i = 0; i < SIZE; i++) { //El evento de LIMPIEZA terminó
+            if (interesadosL[i] != -1) {
+                kill(interesadosL[i], SIGPIPE);
+            }
+        }
         break;
     case 2:
-        printf("Enviar señal SIGVTALRM a lista de clientes de que evento de ACTUALIZACION terminó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de actualización una señal SIGVTALRM
+        for(int i = 0; i < SIZE; i++){ //El evento de ACTUALIZACIÓN terminó
+            if(interesadosA[i]!= -1){
+                kill(interesadosA[i], SIGVTALRM);
+            }
+        }
         break;
     case 3:
-        printf("Enviar señal SIGPROF a lista de clientes de que evento de ENVIO terminó.\n"); // Borrar esta línea
-        // --- CODE HERE ---
-        // Enviar a todos los clientes del arreglo de envío una señal SIGPROF
+        for(int i = 0; i < SIZE; i++){ //El evento de ENVÍO comenzó
+            if(interesadosE[i]!=-1){
+                kill(interesadosE[i], SIGPROF);
+            }   
+        }
         break;
     }
 }
