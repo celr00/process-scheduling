@@ -3,6 +3,9 @@ import os
 import signal
 import sys
 
+### EVENTOS ###
+events = []
+
 ### MANEJO DE SEÑALES ###
 
 def funcion_int(sig, frame):
@@ -25,17 +28,24 @@ def sub_event(eventType):
     ### --- CODE HERE ---
     # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
     # Poner mensaje en results_label de que se suscribió correctamente o algo.
+        if eventType not in events:
+            events.append(eventType)
+        results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
 
 def unsub_event(eventType):
     print("Desuscribir {}".format(eventType))
     ### --- CODE HERE ---
     # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
     # Poner mensaje en results_label de que se desuscribió correctamente o algo.
+        if eventType in events:
+            events.remove(eventType)    
+        results_label.insert(tk.END, f"Se ha desuscrito al evento de {eventType}.\n")
 
 def list_events():
     print("Listar eventos a los que el cliente está suscrito")
-    ### --- CODE HERE ---
     # Listar a qué eventos el cliente está suscrito (se podría guardar aquí internamente en un arreglo)
+    msg = ", ".join(events)
+    results_label.insert(tk.END, f"Suscrito a: {msg}.\n")
 
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
