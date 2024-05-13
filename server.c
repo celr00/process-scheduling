@@ -62,7 +62,7 @@ int quantum = 5;
 int currentSeconds = 0;
 int second_1 = 1;
 // Lista de clientes interesados
-int interesadosL[SIZE]={-1}, interesadosA[SIZE]={-1}, interesadosE[SIZE]={-1};
+int interesadosL[SIZE] = {-1}, interesadosA[SIZE] = {-1}, interesadosE[SIZE] = {-1};
 // Algoritmo actual
 int currentAlgorithm = 1;
 
@@ -176,14 +176,18 @@ void funcion_int_exit()
 {
     printf("\nTerminando servidor.\n");
     printf("Enviando señal de terminación a todos los clientes.\n");
-    for (int i = 0; i < SIZE; i++){
-        if (interesadosL[i] != -1){
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (interesadosL[i] != -1)
+        {
             kill(interesadosL[i], SIGKILL);
         }
-        if (interesadosA[i] != -1){
+        if (interesadosA[i] != -1)
+        {
             kill(interesadosA[i], SIGKILL);
         }
-        if (interesadosE[i] != -1){
+        if (interesadosE[i] != -1)
+        {
             kill(interesadosE[i], SIGKILL);
         }
     }
@@ -195,41 +199,51 @@ void add_event(pid_t idCliente, int type)
 {
     printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // Asegurar que el ID del cliente sea válido
-    if (idCliente != -1) {
+    if (idCliente != -1)
+    {
         // Según el tipo de evento, añadir el cliente a la cola respectiva
-        switch (type) {
-            case LIMPIEZA:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosL[i] == -1) {
-                        interesadosL[i] = idCliente;
-                        return; 
-                    }
+        switch (type)
+        {
+        case LIMPIEZA:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosL[i] == -1)
+                {
+                    interesadosL[i] = idCliente;
+                    return;
                 }
-                printf("La cola de interesados en limpieza está llena.\n");
-                break;
-            case ACTUALIZACION:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosA[i] == -1) {
-                        interesadosA[i] = idCliente;
-                        return; 
-                    }
+            }
+            printf("La cola de interesados en limpieza está llena.\n");
+            break;
+        case ACTUALIZACION:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosA[i] == -1)
+                {
+                    interesadosA[i] = idCliente;
+                    return;
                 }
-                printf("La cola de interesados en actualización está llena.\n");
-                break;
-            case ENVIO:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosE[i] == -1) {
-                        interesadosE[i] = idCliente;
-                        return; 
-                    }
+            }
+            printf("La cola de interesados en actualización está llena.\n");
+            break;
+        case ENVIO:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosE[i] == -1)
+                {
+                    interesadosE[i] = idCliente;
+                    return;
                 }
-                printf("La cola de interesados en envío está llena.\n");
-                break;
-            default:
-                printf("Tipo de evento inválido.\n");
-                break;
+            }
+            printf("La cola de interesados en envío está llena.\n");
+            break;
+        default:
+            printf("Tipo de evento inválido.\n");
+            break;
         }
-    } else {
+    }
+    else
+    {
         printf("ID de cliente inválido.\n");
     }
 }
@@ -239,41 +253,51 @@ void remove_event(pid_t idCliente, int type)
 {
     printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
     // Asegurar que el ID del cliente sea válido
-    if (idCliente != -1) {
+    if (idCliente != -1)
+    {
         // Según el tipo de evento, buscar al cliente y eliminarlo de la lista de interesados
-        switch (type) {
-            case LIMPIEZA:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosL[i] == idCliente) {
-                        interesadosL[i] = -1;
-                        return; 
-                    }
+        switch (type)
+        {
+        case LIMPIEZA:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosL[i] == idCliente)
+                {
+                    interesadosL[i] = -1;
+                    return;
                 }
-                printf("La cola de interesados en limpieza está llena.\n");
-                break;
-            case ACTUALIZACION:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosA[i] == idCliente) {
-                        interesadosA[i] = -1;
-                        return; 
-                    }
+            }
+            printf("La cola de interesados en limpieza está llena.\n");
+            break;
+        case ACTUALIZACION:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosA[i] == idCliente)
+                {
+                    interesadosA[i] = -1;
+                    return;
                 }
-                printf("La cola de interesados en actualización está llena.\n");
-                break;
-            case ENVIO:
-                for (int i = 0; i < SIZE; i++) {
-                    if (interesadosE[i] == idCliente) {
-                        interesadosE[i] = -1;
-                        return; 
-                    }
+            }
+            printf("La cola de interesados en actualización está llena.\n");
+            break;
+        case ENVIO:
+            for (int i = 0; i < SIZE; i++)
+            {
+                if (interesadosE[i] == idCliente)
+                {
+                    interesadosE[i] = -1;
+                    return;
                 }
-                printf("La cola de interesados en envío está llena.\n");
-                break;
-            default:
-                printf("Tipo de evento inválido.\n");
-                break;
+            }
+            printf("La cola de interesados en envío está llena.\n");
+            break;
+        default:
+            printf("Tipo de evento inválido.\n");
+            break;
         }
-    } else {
+    }
+    else
+    {
         printf("ID de cliente inválido.\n");
     }
 }
@@ -300,23 +324,26 @@ void list_event(int type)
     printf("Imprimir clientes de evento %s\n", getEventType(type));
     // Acceder al arreglo de interesados correspondiente al tipo de evento
     pid_t *interesados;
-    switch (type) {
-        case LIMPIEZA:
-            interesados = interesadosL;
-            break;
-        case ACTUALIZACION:
-            interesados = interesadosA;
-            break;
-        case ENVIO:
-            interesados = interesadosE;
-            break;
-        default:
-            printf("Tipo de evento inválido.\n");
-            return;
+    switch (type)
+    {
+    case LIMPIEZA:
+        interesados = interesadosL;
+        break;
+    case ACTUALIZACION:
+        interesados = interesadosA;
+        break;
+    case ENVIO:
+        interesados = interesadosE;
+        break;
+    default:
+        printf("Tipo de evento inválido.\n");
+        return;
     }
     // Imprimir la lista de clientes suscritos al evento
-    for(int i = 0; i < SIZE; i++) {
-        if (interesados[i] != -1) {
+    for (int i = 0; i < SIZE; i++)
+    {
+        if (interesados[i] != -1)
+        {
             printf("ID Cliente: %d\n", interesados[i]);
         }
     }
@@ -494,24 +521,30 @@ void send_start(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        for (int i = 0; i < SIZE; i++) { //El evento de LIMPIEZA comenzó
-            if (interesadosL[i] != -1) {
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de LIMPIEZA comenzó
+            if (interesadosL[i] != -1)
+            {
                 kill(interesadosL[i], SIGCONT);
             }
         }
         break;
     case 2:
-        for(int i = 0; i < SIZE; i++){ //El evento de ACTUALIZACIÓN comenzó
-            if(interesadosA[i]!= -1){
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de ACTUALIZACIÓN comenzó
+            if (interesadosA[i] != -1)
+            {
                 kill(interesadosA[i], SIGXCPU);
             }
         }
         break;
     case 3:
-        for(int i = 0; i < SIZE; i++){ //El evento de ENVÍO comenzó
-            if(interesadosE[i]!=-1){
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de ENVÍO comenzó
+            if (interesadosE[i] != -1)
+            {
                 kill(interesadosE[i], SIGXFSZ);
-            }   
+            }
         }
         break;
     }
@@ -523,24 +556,30 @@ void send_end(int tipoEvento)
     switch (tipoEvento)
     {
     case 1:
-        for (int i = 0; i < SIZE; i++) { //El evento de LIMPIEZA terminó
-            if (interesadosL[i] != -1) {
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de LIMPIEZA terminó
+            if (interesadosL[i] != -1)
+            {
                 kill(interesadosL[i], SIGPIPE);
             }
         }
         break;
     case 2:
-        for(int i = 0; i < SIZE; i++){ //El evento de ACTUALIZACIÓN terminó
-            if(interesadosA[i]!= -1){
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de ACTUALIZACIÓN terminó
+            if (interesadosA[i] != -1)
+            {
                 kill(interesadosA[i], SIGVTALRM);
             }
         }
         break;
     case 3:
-        for(int i = 0; i < SIZE; i++){ //El evento de ENVÍO comenzó
-            if(interesadosE[i]!=-1){
+        for (int i = 0; i < SIZE; i++)
+        { // El evento de ENVÍO comenzó
+            if (interesadosE[i] != -1)
+            {
                 kill(interesadosE[i], SIGPROF);
-            }   
+            }
         }
         break;
     }
@@ -564,6 +603,13 @@ void fcfs()
         pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -585,6 +631,13 @@ void fifo()
         pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -613,6 +666,13 @@ void round_robin()
         pthread_join(id, NULL);
         executing = false;
         printf("Quantum de evento %d terminado, quedan %d segundos\n", evento.id, evento.remaining_time);
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         // Volver a meter evento si aún no se termina
         if (evento.remaining_time > 0)
         {
@@ -646,6 +706,13 @@ void sjf()
         executing = false;
         dequeue(minIndex, procesos, &cola);
         dequeue(minIndex, q0, &cola_q0); // Eliminar de MLFQ
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -675,6 +742,13 @@ void srt()
         executing = false;
         // Actualizar tiempo de evento
         evento->remaining_time--;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento->id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         // Eliminar evento si ya terminó
         if (evento->remaining_time <= 0)
         {
@@ -761,6 +835,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             // Meter a siguiente queue si el evento aún no termina
             if (e.remaining_time > 0)
             {
@@ -796,6 +877,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             // Meter a siguiente queue si el evento aún no termina
             if (e.remaining_time > 0)
             {
@@ -826,6 +914,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Evento %d terminado\n", e.id);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             send_end(e.type);
         }
     }
