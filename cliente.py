@@ -180,7 +180,8 @@ s5 = tk.Frame(window, bd=2, pady=10, padx=10)
 s5.grid(row=4, column=0, sticky="nsew")
 s5.columnconfigure(0, weight=1, uniform="a")
 
-results_label = tk.Label(s5, text="Esperando...", font=("Verdana", 13), height=5, bg="white", borderwidth=2, relief="solid")
+results_label = tk.Text(s5, font=("Verdana", 13), height=5, bg="white", borderwidth=2, relief="solid")
+results_label.insert(tk.END, f"Esperando...\n")
 results_label.grid(row=0, column=0, sticky="nsew", pady=(0,10), padx=10)
 
 
