@@ -7,7 +7,8 @@
 2. ./server
 
 ### Para correr un cliente (en una terminal nueva)
-1. python cliente.py
+1. Instalar la librería Tkinter: sudo dnf install python3-tkinter (Fedora)
+2. python cliente.py
 
 ---
 
