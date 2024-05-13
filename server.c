@@ -233,21 +233,22 @@ void dequeue_cliente(pid_t idCliente, int interesados[], int *rear)
 // Añadir un cliente a la lista de interesados
 void add_event(pid_t idCliente, int type)
 {
+    int pid = getpgid(idCliente);
     // Asegurar que el ID del cliente sea válido
-    if (getpgid(idCliente) != -1)
+    if (pid != -1)
     {
-        printf("Añadir cliente con ID %d a lista de interesados %s\n", getpgid(idCliente), getEventType(type));
+        printf("Añadir cliente con ID %d a lista de interesados %s\n", pid, getEventType(type));
         // Según el tipo de evento, añadir el cliente a la cola respectiva
         switch (type)
         {
         case LIMPIEZA:
-            enqueue_cliente(getpgid(idCliente), interesadosL, &limpieza);
+            enqueue_cliente(pid, interesadosL, &limpieza);
             break;
         case ACTUALIZACION:
-            enqueue_cliente(getpgid(idCliente), interesadosA, &actualizacion);
+            enqueue_cliente(pid, interesadosA, &actualizacion);
             break;
         case ENVIO:
-            enqueue_cliente(getpgid(idCliente), interesadosE, &envio);
+            enqueue_cliente(pid, interesadosE, &envio);
             break;
         default:
             printf("Tipo de evento inválido.\n");
@@ -259,21 +260,22 @@ void add_event(pid_t idCliente, int type)
 // Eliminar un cliente de la lista de interesados
 void remove_event(pid_t idCliente, int type)
 {
+    int pid = getpgid(idCliente);
     // Asegurar que el ID del cliente sea válido
-    if (getpgid(idCliente) != -1)
+    if (pid != -1)
     {
-        printf("Eliminar cliente con ID %d de lista de interesados %s\n", getpgid(idCliente), getEventType(type));
+        printf("Eliminar cliente con ID %d de lista de interesados %s\n", pid, getEventType(type));
         // Según el tipo de evento, buscar al cliente y eliminarlo de la lista de interesados
         switch (type)
         {
         case LIMPIEZA:
-            dequeue_cliente(getpgid(idCliente), interesadosL, &limpieza);
+            dequeue_cliente(pid, interesadosL, &limpieza);
             break;
         case ACTUALIZACION:
-            dequeue_cliente(getpgid(idCliente), interesadosA, &actualizacion);
+            dequeue_cliente(pid, interesadosA, &actualizacion);
             break;
         case ENVIO:
-            dequeue_cliente(getpgid(idCliente), interesadosE, &envio);
+            dequeue_cliente(pid, interesadosE, &envio);
             break;
         default:
             printf("Tipo de evento inválido.\n");
@@ -288,7 +290,7 @@ void trigger_event(pid_t idCliente, int type)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("Cliente con ID %d ha enviado un evento de tipo %s\n", getpgid(idCliente), getEventType(type));
+        printf("Cliente con ID %d ha enviado un evento de tipo %s\n", pid, getEventType(type));
         int random_number = (rand() % 20) + 1; // Duración aleatoria
         Evento event = {globalID, random_number, random_number, currentSeconds, 0, 0, 0.0, type};
         printf("Creando evento...\tID %d\t\tBT: %d s / AT: %d s / Tipo: %s\n\n", globalID, random_number, currentSeconds, getEventType(type));
@@ -348,7 +350,7 @@ void funcion_usr1(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a First Come First Serve.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a First Come First Serve.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 1;
     }
@@ -360,7 +362,7 @@ void funcion_quit(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a FIFO.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a FIFO.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 2;
     }
@@ -372,7 +374,7 @@ void funcion_ill(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Round Robin.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Round Robin.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 3;
     }
@@ -384,7 +386,7 @@ void funcion_trap(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Job First.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Job First.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 4;
     }
@@ -396,7 +398,7 @@ void funcion_abrt(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Remaining Time.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Shortest Remaining Time.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 5;
     }
@@ -408,7 +410,7 @@ void funcion_fpe(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Highest Response-Ratio Next.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Highest Response-Ratio Next.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 6;
     }
@@ -420,7 +422,7 @@ void funcion_stkflt(pid_t idCliente)
     int pid = getpgid(idCliente);
     if (pid != -1)
     {
-        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Multilevel Feedback Queues.\n", getpgid(idCliente));
+        printf("\nCliente con ID %d solicitó un cambio de algoritmo a Multilevel Feedback Queues.\n", pid);
         printf("\nCambiando algoritmo en próxima iteración.\n\n");
         currentAlgorithm = 7;
     }
