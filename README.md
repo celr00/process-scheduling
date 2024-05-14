@@ -110,7 +110,7 @@ URL a YouTube: PENDIENTE
     <tr>
         <td>SIGCONT</td>
         <td><b>Envía</b> una señal a los clientes de que un evento de tipo LIMPIEZA ha comenzado su ejecución.</td>
-        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tiempo LIMPIEZA ha comenzado su ejecución.</td>
+        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tipo LIMPIEZA ha comenzado su ejecución.</td>
     </tr>
     <tr>
         <td>SIGTSTP</td>
@@ -135,12 +135,12 @@ URL a YouTube: PENDIENTE
     <tr>
         <td>SIGXCPU</td>
         <td><b>Envía</b> una señal a los clientes de que un evento de tipo ACTUALIZACION ha comenzado su ejecución.</td>
-        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tiempo ACTUALIZACION ha comenzado su ejecución.</td>
+        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tipo ACTUALIZACION ha comenzado su ejecución.</td>
     </tr>
     <tr>
         <td>SIGXFSZ</td>
         <td><b>Envía</b> una señal a los clientes de que un evento de tipo ENVIO ha comenzado su ejecución.</td>
-        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tiempo ENVIO ha comenzado su ejecución.</td>
+        <td>Cuando <b>recibe</b> la señal, el cliente es notificado de que un evento de tipo ENVIO ha comenzado su ejecución.</td>
     </tr>
     <tr>
         <td>SIGVTALRM</td>
