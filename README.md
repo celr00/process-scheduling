@@ -34,7 +34,7 @@ URL a YouTube: PENDIENTE
     </tr>
     <tr>
         <td>SIGHUP</td>
-        <td>Cuando <b>recibe</b> la señal, añade un al cliente a la lista de interesados del evento ENVIO.</td>
+        <td>Cuando <b>recibe</b> la señal, añade al cliente a la lista de interesados del evento ENVIO.</td>
         <td><b>Envía</b> una señal al servidor para suscribirse al evento ENVIO.</td>
     </tr>
     <tr>
@@ -94,12 +94,12 @@ URL a YouTube: PENDIENTE
     </tr>
     <tr>
         <td>SIGALRM</td>
-        <td>Cuando <b>recibe</b> la señal, añade un al cliente a la lista de interesados del evento LIMPIEZA.</td>
+        <td>Cuando <b>recibe</b> la señal, añade al cliente a la lista de interesados del evento LIMPIEZA.</td>
         <td><b>Envía</b> una señal al servidor para suscribirse al evento LIMPIEZA.</td>
     </tr>
     <tr>
         <td>SIGTERM</td>
-        <td>Cuando <b>recibe</b> la señal, añade un al cliente a la lista de interesados del evento ACTUALIZACION.</td>
+        <td>Cuando <b>recibe</b> la señal, añade al cliente a la lista de interesados del evento ACTUALIZACION.</td>
         <td><b>Envía</b> una señal al servidor para suscribirse al evento ACTUALIZACION.</td>
     </tr>
     <tr>
