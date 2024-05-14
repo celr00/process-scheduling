@@ -451,7 +451,7 @@ void funcion_tstp(int sig)
         else
             list_event(event_name);
         break;
-    case 3:
+    case 2:
         list_algorithms();
         break;
     default:
