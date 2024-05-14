@@ -39,7 +39,9 @@ def sub_event(eventType):
 
         if eventType not in events:
             events.append(eventType)
-        results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
+            results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
+        else:
+            results_label.insert(tk.END, f"Ya se encontraba suscrito al evento de {eventType}.\n")
 
 def unsub_event(eventType):
     server_pid = server_pid_txt.get()
@@ -100,6 +102,12 @@ def send_event(eventType):
             os.system("kill -s SIGURG {}".format(server_pid))
         eventTypeStr = "LIMPIEZA" if eventType==1 else "ACTUALIZACION" if eventType==2 else "ENVIO" if eventType==3 else ""
         results_label.insert(tk.END, f"Evento de tipo {eventTypeStr} enviado al servidor.\n")
+
+def on_closing():
+    toClose = events[:]
+    for event in toClose:
+        unsub_event(event)
+    window.destroy()
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
@@ -214,6 +222,9 @@ signal.signal(signal.SIGPIPE, event_end)
 signal.signal(signal.SIGVTALRM, event_end)
 signal.signal(signal.SIGPROF, event_end)
 
+### CIERRE DE LA VENTANA ###
+
+window.protocol("WM_DELETE_WINDOW", on_closing)
 
 ### DESPLEGAR VENTANA ###
 
