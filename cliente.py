@@ -29,7 +29,6 @@ def sub_event(eventType):
     else:
         print("Suscribir {}".format(eventType))
         # Enviar una señal de tipo SIGALRM / SIGTERM / SIGHUP al servidor, según el tipo de evento
-        # Poner mensaje en results_label de que se suscribió correctamente o algo.
         if eventType == "LIMPIEZA":
             os.system("kill -s ALRM {}".format(server_pid))
         elif eventType == "ACTUALIZACION":
@@ -50,7 +49,6 @@ def unsub_event(eventType):
     else:
         print("Desuscribir {}".format(eventType))
         # Enviar una señal de tipo SIGBUS / SIGSEGV / SIGUSR2 al servidor, según el tipo de evento
-        # Poner mensaje en results_label de que se desuscribió correctamente o algo.
         if eventType == "LIMPIEZA":
             os.system("kill -s BUS {}".format(server_pid))
         elif eventType == "ACTUALIZACION":
