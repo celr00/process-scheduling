@@ -12,15 +12,15 @@
 
 ---
 
-## 2. Explicación de proyecto
+## 2. Video de funcionamiento
 
-PENDIENTE: Explicar cómo se resolvió cada requisito de la aplicación.
+URL a YouTube: PENDIENTE
 
 ---
 
-## 3. Video de funcionamiento
+## 3. Explicación de proyecto
 
-URL a YouTube: PENDIENTE
+PENDIENTE: Explicar cómo se resolvió cada requisito de la aplicación.
 
 ---
 
