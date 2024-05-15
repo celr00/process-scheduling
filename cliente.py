@@ -6,22 +6,28 @@ import sys
 ### EVENTOS ###
 events = []
 
+
 ### MANEJO DE SEÑALES ###
 
+# Salir del programa
 def funcion_int(sig, frame):
     window.destroy()
     sys.exit(0)
 
+# Notificar inicio de un tipo de evento
 def event_start(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGCONT else "ACTUALIZACION" if sig==signal.SIGXCPU else "ENVIO" if sig==signal.SIGXFSZ else ""
     results_label.insert(tk.END, "Un evento de tipo {} ha comenzado su ejecución.\n".format(eventType))
 
+# Notificar fin de un tipo de evento
 def event_end(sig, frame):
     eventType = "LIMPIEZA" if sig==signal.SIGPIPE else "ACTUALIZACION" if sig==signal.SIGVTALRM else "ENVIO" if sig==signal.SIGPROF else ""
     results_label.insert(tk.END, "Un evento de tipo {} ha terminado su ejecución.\n".format(eventType))
 
+
 ### MANEJO DE COMANDOS ###
 
+# Suscribirse a un evento
 def sub_event(eventType):
     server_pid = server_pid_txt.get()
     if not server_pid:
@@ -40,6 +46,7 @@ def sub_event(eventType):
             events.append(eventType)
             results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
 
+# Desuscribirse de un evento
 def unsub_event(eventType):
     server_pid = server_pid_txt.get()
     if not server_pid:
@@ -58,12 +65,13 @@ def unsub_event(eventType):
             events.remove(eventType)
         results_label.insert(tk.END, f"Se ha desuscrito al evento de {eventType}.\n")
 
+# Listar eventos a los que el cliente está suscrito
 def list_events():
     print("Listar eventos a los que el cliente está suscrito")
-    # Listar a qué eventos el cliente está suscrito (se podría guardar aquí internamente en un arreglo)
     msg = ", ".join(events)
     results_label.insert(tk.END, f"Suscrito a: {msg}.\n")
 
+# Enviar al servidor una solicitud de cambio de algoritmo
 def change_algorithm(algorithm):
     server_pid = server_pid_txt.get()
     if not server_pid:
@@ -85,6 +93,7 @@ def change_algorithm(algorithm):
             os.system("kill -s STKFLT {}".format(server_pid))
         results_label.insert(tk.END, f"Algoritmo cambiado.\n")
 
+# Enviar al servidor una solicitud para crear un tipo de evento
 def send_event(eventType):
     server_pid = server_pid_txt.get()
     if not server_pid:
@@ -99,11 +108,13 @@ def send_event(eventType):
         eventTypeStr = "LIMPIEZA" if eventType==1 else "ACTUALIZACION" if eventType==2 else "ENVIO" if eventType==3 else ""
         results_label.insert(tk.END, f"Evento de tipo {eventTypeStr} enviado al servidor.\n")
 
+# Cerrar ventana -> Enviar al servidor notificación de desuscripción
 def on_closing():
     toClose = events[:]
     for event in toClose:
         unsub_event(event)
     window.destroy()
+
 
 ### INICIALIZACIÓN DE INTERFAZ GRÁFICA ###
 
@@ -126,6 +137,7 @@ window.geometry(f"{ancho_window}x{alto_window}+{posicion_x}+{posicion_y}")
 
 # Establecer pesos de columnas y filas
 window.columnconfigure(0, weight=1, uniform="a")
+
 
 ### SECCIÓN 1: PID DE SERVIDOR ###
 
