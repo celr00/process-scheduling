@@ -11,6 +11,9 @@ events = []
 
 # Salir del programa
 def funcion_int(sig, frame):
+    toClose = events[:]
+    for event in toClose:
+        unsub_event(event)
     window.destroy()
     sys.exit(0)
 
