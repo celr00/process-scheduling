@@ -39,8 +39,6 @@ def sub_event(eventType):
         if eventType not in events:
             events.append(eventType)
             results_label.insert(tk.END, f"Se ha suscrito al evento de {eventType}.\n")
-        else:
-            results_label.insert(tk.END, f"Ya se encontraba suscrito al evento de {eventType}.\n")
 
 def unsub_event(eventType):
     server_pid = server_pid_txt.get()
@@ -95,9 +93,9 @@ def send_event(eventType):
         if eventType == 1:
             os.system("kill -s TTIN {}".format(server_pid))
         if eventType == 2:
-            os.system("kill -s SIGTTOU {}".format(server_pid))
+            os.system("kill -s TTOU {}".format(server_pid))
         if eventType == 3:
-            os.system("kill -s SIGURG {}".format(server_pid))
+            os.system("kill -s URG {}".format(server_pid))
         eventTypeStr = "LIMPIEZA" if eventType==1 else "ACTUALIZACION" if eventType==2 else "ENVIO" if eventType==3 else ""
         results_label.insert(tk.END, f"Evento de tipo {eventTypeStr} enviado al servidor.\n")
 
