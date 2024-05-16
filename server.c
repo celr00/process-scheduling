@@ -183,15 +183,15 @@ void funcion_int_exit()
     // Iterar hasta el tamaño de la lista de interesados
     for (int i = 0; i < limpieza; i++)
     {
-        kill(interesadosL[i], SIGKILL);
+        kill(interesadosL[i], SIGINT);
     }
     for (int i = 0; i < actualizacion; i++)
     {
-        kill(interesadosA[i], SIGKILL);
+        kill(interesadosA[i], SIGINT);
     }
     for (int i = 0; i < envio; i++)
     {
-        kill(interesadosE[i], SIGKILL);
+        kill(interesadosE[i], SIGINT);
     }
     exit(0);
 }
