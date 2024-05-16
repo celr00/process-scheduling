@@ -20,7 +20,7 @@ URL a YouTube: PENDIENTE
 
 ## 3. Explicación de proyecto
 
-De forma resumida, los requisitos de la aplicación de se cumplen de la siguiente forma.
+De forma resumida, los requisitos de la aplicación se cumplen de la siguiente forma.
 
 ### Aplicación servidor
 
@@ -37,9 +37,9 @@ La aplicación servidor se encarga de <b>recibir señales</b> y <b>manejar event
     * Highest Response-Ratio Next (HRRN)
     * Multilevel Feedback Queues (MLFQ)
 * Solamente se tiene una instancia del servidor desde la terminal.
-* Para identificar el PID del cliente que envía una señal, se utiliza el manejador de señales <code>sigaction()</code>. Específicamente, la estructura la estructura <code>siginfo_t</code> (proporcionada por sigaction) tiene un campo llamado <code>si_pid</code>, el cual contiene el PID del emisor de la señal.
+* Para identificar el PID del cliente que envía una señal, se utiliza el manejador de señales <code>sigaction()</code>. Específicamente, la estructura <code>siginfo_t</code> (proporcionada por sigaction) tiene un campo llamado <code>si_pid</code>, el cual contiene el PID del emisor de la señal.
 * La ejecución de los eventos se maneja a través de Threads.
-* El servidor puede recibir señales del cliente en cualquir momento para realizar un cambio de algoritmo.
+* El servidor puede recibir señales del cliente en cualquier momento para realizar un cambio de algoritmo.
 * La fila de procesos listos se maneja a través de un arreglo.
 
 
@@ -74,7 +74,7 @@ La aplicación cliente se encarga de <b>enviar señales y eventos al servidor</b
 
 #### Comandos del cliente
 1. <code>sub event_name</code>: Envía una señal al servidor para suscribirse a un evento de cierto tipo (LIMPIEZA, ACTUALIZACIÓN, ENVÍO).
-2. <code>unsub event_name</code>: Envía una señal al servidor para desuscribirse a un evento de cierto tipo (LIMPIEZA, ACTUALIZACIÓN, ENVÍO).
+2. <code>unsub event_name</code>: Envía una señal al servidor para desuscribirse de un evento de cierto tipo (LIMPIEZA, ACTUALIZACIÓN, ENVÍO).
 3. <code>list</code>: Imprime todos los eventos a los cuales el cliente se encuentra suscrito.
 4. <code>send_event</code>: Envía una señal al servidor para crear un tipo de evento (LIMPIEZA, ACTUALIZACIÓN, ENVÍO).
 5. <code>ask</code>: Este comando está implícito en la interfaz gráfica ya que, por cada tipo de evento, se muestra un botón.
