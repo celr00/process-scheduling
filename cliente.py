@@ -185,7 +185,7 @@ tk.Label(liste_frame, text="list", font=("Verdana", 14), bg="#372FAF", fg="white
 tk.Button(liste_frame, text='Mis suscripciones', font=("Verdana", 12), command=list_events).grid(row=1, column=0, sticky="nsew", pady=5)
 
 
-### SECCIÓN 3: Desencadenar un evento en el servidor ###
+### SECCIÓN 3: DESENCADENAR UN EVENTO EN EL SERVIDOR ###
 s3 = tk.Frame(window, bd=2, pady=10, padx=10)
 s3.grid(row=2, column=0, sticky="nsew")
 s3.columnconfigure((0,1,2), weight=1, uniform="a")
