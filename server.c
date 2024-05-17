@@ -585,6 +585,13 @@ void fcfs()
         pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -606,6 +613,13 @@ void fifo()
         pthread_create(&id, NULL, sleep_process, &evento.remaining_time);
         pthread_join(id, NULL);
         executing = false;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -634,6 +648,13 @@ void round_robin()
         pthread_join(id, NULL);
         executing = false;
         printf("Quantum de evento %d terminado, quedan %d segundos\n", evento.id, evento.remaining_time);
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         // Volver a meter evento si aún no se termina
         if (evento.remaining_time > 0)
         {
@@ -667,6 +688,13 @@ void sjf()
         executing = false;
         dequeue(minIndex, procesos, &cola);
         dequeue(minIndex, q0, &cola_q0); // Eliminar de MLFQ
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento.id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         printf("Evento %d terminado\n", evento.id);
         send_end(evento.type);
     }
@@ -696,6 +724,13 @@ void srt()
         executing = false;
         // Actualizar tiempo de evento
         evento->remaining_time--;
+        // Actualizar tiempos de espera de todos los procesos menos del actual
+        int n2 = get_queue_length();
+        for (int i = 0; i < n2; i++)
+        {
+            if (procesos[i].id != evento->id)
+                procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+        }
         // Eliminar evento si ya terminó
         if (evento->remaining_time <= 0)
         {
@@ -782,6 +817,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             // Meter a siguiente queue si el evento aún no termina
             if (e.remaining_time > 0)
             {
@@ -817,6 +859,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Quantum de evento %d terminado, quedan %d segundos\n", e.id, e.remaining_time);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             // Meter a siguiente queue si el evento aún no termina
             if (e.remaining_time > 0)
             {
@@ -847,6 +896,13 @@ void mlfq()
             pthread_join(id, NULL);
             executing = false;
             printf("Evento %d terminado\n", e.id);
+            // Actualizar tiempos de espera de todos los procesos menos del actual
+            int n2 = get_queue_length();
+            for (int i = 0; i < n2; i++)
+            {
+                if (procesos[i].id != e.id)
+                    procesos[i].waiting_time = currentSeconds - procesos[i].arrival_time;
+            }
             send_end(e.type);
         }
     }
