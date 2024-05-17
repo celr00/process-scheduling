@@ -14,7 +14,7 @@
 
 ## 2. Video de funcionamiento
 
-URL a YouTube: PENDIENTE
+URL a YouTube: [https://youtu.be/IVSaM0GFJuw](https://youtu.be/IVSaM0GFJuw)
 
 ---
 
